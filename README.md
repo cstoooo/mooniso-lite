@@ -8,27 +8,30 @@ repository always stays runnable.
 
 ## Current milestone
 
-Milestone 1: runnable project skeleton and CLI help.
+Milestone 2: read a `pain.001.xml` file and print a basic summary.
 
 ## Run
 
 ```bash
 moon check
-moon run cmd/main -- --help
+moon test
+moon run cmd/main -- fixtures/valid_pain001.xml
 ```
 
-Expected output starts with:
+Expected summary:
 
 ```text
-MoonISO Lite 0.1.0
+Message ID: MSG-001
+Creation time: 2026-10-08T12:00:00Z
+Payment instructions: 1
+Transactions: 2
 ```
 
 ## Roadmap
 
-- Milestone 2: parse a `pain.001.xml` file
 - Milestone 3: validate required fields and basic business rules
 - Milestone 4: emit JSON and Markdown reports
-- Milestone 5: add fixtures and regression tests
+- Milestone 5: add more fixtures and regression tests
 
 ## License
 
