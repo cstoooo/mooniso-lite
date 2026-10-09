@@ -2,15 +2,11 @@
 
 # MoonISO Lite
 
-MoonISO Lite is a MoonBit-native command-line tool for validating ISO 20022
-`pain.001` payment initiation messages.
+MoonBit command-line validator for ISO 20022 `pain.001` payment messages.
 
-The project is intentionally being built in small, reviewable milestones so the
-repository always stays runnable.
+## Status
 
-## Current milestone
-
-Milestone 6: validate the declared control sum against instructed amounts.
+Current support: `pain.001.001.03` core fields and rules.
 
 ## Run
 
@@ -25,7 +21,7 @@ moon run cmd/main -- --format json fixtures/valid_pain001.xml
 moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
 ```
 
-## Rules implemented
+## Rules
 
 - Message ID is required.
 - Creation date time is required.
@@ -35,17 +31,13 @@ moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
 - End-to-end ID is required and must be unique.
 - Instructed amount and currency are required.
 - `NbOfTxs` must be an unsigned integer and match the parsed transaction count.
-- Dates, datetime, currency and amount formats are checked.
+- Date, datetime, currency and amount formats are checked.
 - `CtrlSum` must match the sum of instructed amounts when present.
-
-## Roadmap
-
-
 
 ## License
 
 Apache-2.0
 
-## Project proposal
+## Project description
 
 See [docs/proposal.md](docs/proposal.md).
