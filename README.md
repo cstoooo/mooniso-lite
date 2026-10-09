@@ -43,3 +43,7 @@ moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
 ## License
 
 Apache-2.0
+
+## Project proposal
+
+See [docs/proposal.md](docs/proposal.md).
