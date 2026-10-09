@@ -63,3 +63,10 @@ test "invalid pain.001 reports required-field and duplicate issues" {
   assert_false(report.is_valid())
   assert_true(report.diagnostics.length() >= 6)
 }
+
+///|
+test "validation report supports json and markdown" {
+  let report = @mooniso_lite.validate_pain001(valid_pain001_xml())
+  assert_true(report.to_json().contains("\"valid\": true"))
+  assert_true(report.to_markdown().contains("**Result:** VALID"))
+}

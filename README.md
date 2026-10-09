@@ -8,8 +8,7 @@ repository always stays runnable.
 
 ## Current milestone
 
-Milestone 3: validate required fields, duplicate end-to-end IDs and declared
-transaction counts.
+Milestone 4: emit text, JSON and Markdown validation reports.
 
 ## Run
 
@@ -17,13 +16,8 @@ transaction counts.
 moon check
 moon test
 moon run cmd/main -- fixtures/valid_pain001.xml
-moon run cmd/main -- fixtures/invalid_pain001.xml
-```
-
-Expected result:
-
-```text
-Result: VALID
+moon run cmd/main -- --format json fixtures/valid_pain001.xml
+moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
 ```
 
 ## Rules implemented
@@ -39,8 +33,8 @@ Result: VALID
 
 ## Roadmap
 
-- Milestone 4: emit JSON and Markdown reports
-- Milestone 5: add more fixtures and regression tests
+- Milestone 5: add format validation and more regression fixtures
+- Milestone 6: add control sum validation
 
 
 ## License

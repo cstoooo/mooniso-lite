@@ -170,3 +170,84 @@ pub fn ValidationReport::to_text(self : ValidationReport) -> String {
   }
   output.to_string()
 }
+
+///|
+pub fn ValidationReport::to_json(self : ValidationReport) -> String {
+  let diagnostics : Array[Json] = []
+  for diagnostic in self.diagnostics {
+    let item : Json = {
+      "code": diagnostic.code,
+      "path": diagnostic.path,
+      "message": diagnostic.message,
+    }
+    diagnostics.push(item)
+  }
+  let message_id : Json = match self.summary.message_id {
+    Some(value) => Json::string(value)
+    None => Json::null()
+  }
+  let creation_datetime : Json = match self.summary.creation_datetime {
+    Some(value) => Json::string(value)
+    None => Json::null()
+  }
+  let summary = Map([])
+  summary.set("messageId", message_id)
+  summary.set("creationDateTime", creation_datetime)
+  summary.set(
+    "paymentInstructionCount",
+    Json::number(self.summary.payment_instruction_count.to_double()),
+  )
+  summary.set(
+    "transactionCount",
+    Json::number(self.summary.transaction_count.to_double()),
+  )
+  let root = Map([])
+  root.set("valid", Json::boolean(self.is_valid()))
+  root.set("summary", Json::object(summary))
+  root.set("diagnostics", Json::array(diagnostics))
+  Json::object(root).stringify(indent=2)
+}
+
+///|
+pub fn ValidationReport::to_markdown(self : ValidationReport) -> String {
+  let output = StringBuilder()
+  output.write_string("# MoonISO Lite validation report\n\n")
+  output.write_string("**Result:** ")
+  if self.is_valid() {
+    output.write_string("VALID\n\n")
+  } else {
+    output.write_string("INVALID\n\n")
+  }
+  output.write_string("## Summary\n\n")
+  output.write_string("- Message ID: ")
+  output.write_string(match self.summary.message_id {
+    Some(value) => value
+    None => "(missing)"
+  })
+  output.write_string("\n- Creation time: ")
+  output.write_string(match self.summary.creation_datetime {
+    Some(value) => value
+    None => "(missing)"
+  })
+  output.write_string("\n- Payment instructions: ")
+  output.write_string(self.summary.payment_instruction_count.to_string())
+  output.write_string("\n- Transactions: ")
+  output.write_string(self.summary.transaction_count.to_string())
+  output.write_string("\n\n## Diagnostics\n\n")
+  if self.is_valid() {
+    output.write_string("No issues found.\n")
+  } else {
+    output.write_string("| Code | Path | Message |\n")
+    output.write_string("|---|---|---|\n")
+    for diagnostic in self.diagnostics {
+      output.write_string("| `")
+      output.write_string(diagnostic.code)
+      output.write_string("` | `")
+      output.write_string(diagnostic.path)
+      output.write_string("` | ")
+      output.write_string(diagnostic.message)
+      output.write_string(" |\n")
+    }
+  }
+  output.to_string()
+}
