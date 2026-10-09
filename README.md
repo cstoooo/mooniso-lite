@@ -13,6 +13,9 @@ Milestone 6: validate the declared control sum against instructed amounts.
 ## Run
 
 ```bash
+scripts/check.sh
+
+# Or run the commands directly:
 moon check
 moon test
 moon run cmd/main -- fixtures/valid_pain001.xml
