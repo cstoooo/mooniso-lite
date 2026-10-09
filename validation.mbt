@@ -30,6 +30,101 @@ fn push_diagnostic(
   diagnostics.push({ code, path, message, })
 }
 
+
+///|
+fn is_digit(c : Char) -> Bool {
+  c >= '0' && c <= '9'
+}
+
+///|
+fn is_iso_date(value : String) -> Bool {
+  if value.length() != 10 {
+    return false
+  }
+  for i = 0; i < value.length(); i = i + 1 {
+    let c = value[i].unsafe_to_char()
+    if i == 4 || i == 7 {
+      if c != '-' {
+        return false
+      }
+    } else if !is_digit(c) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+fn is_iso_datetime(value : String) -> Bool {
+  if value.length() < 19 {
+    return false
+  }
+  for i = 0; i < 19; i = i + 1 {
+    let c = value[i].unsafe_to_char()
+    if i == 4 || i == 7 {
+      if c != '-' {
+        return false
+      }
+    } else if i == 10 {
+      if c != 'T' {
+        return false
+      }
+    } else if i == 13 || i == 16 {
+      if c != ':' {
+        return false
+      }
+    } else if !is_digit(c) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+fn is_currency(value : String) -> Bool {
+  if value.length() != 3 {
+    return false
+  }
+  for c in value {
+    if c < 'A' || c > 'Z' {
+      return false
+    }
+  }
+  true
+}
+
+///|
+fn is_decimal_amount(value : String) -> Bool {
+  if value == "" || value[0] == '.' || value[value.length() - 1] == '.' {
+    return false
+  }
+  let mut dot_count = 0
+  let mut digit_count = 0
+  for c in value {
+    if is_digit(c) {
+      digit_count += 1
+    } else if c == '.' {
+      dot_count += 1
+    } else {
+      return false
+    }
+  }
+  digit_count > 0 && dot_count <= 1
+}
+
+///|
+fn is_unsigned_integer(value : String) -> Bool {
+  if value == "" {
+    return false
+  }
+  for c in value {
+    if !is_digit(c) {
+      return false
+    }
+  }
+  true
+}
+
 ///|
 fn indexed_path(base : String, index : Int) -> String {
   base + "[" + index.to_string() + "]"
@@ -56,6 +151,19 @@ pub fn validate_pain001(
       "GrpHdr/CreDtTm",
       "Creation date time is required.",
     )
+  } else {
+    match data.summary.creation_datetime {
+      Some(value) =>
+        if !is_iso_datetime(value) {
+          push_diagnostic(
+            diagnostics,
+            "CREATION_TIME_INVALID",
+            "GrpHdr/CreDtTm",
+            "Creation date time must use ISO 8601 datetime format.",
+          )
+        }
+      None => ()
+    }
   }
   if data.summary.payment_instruction_count == 0 {
     push_diagnostic(
@@ -81,6 +189,19 @@ pub fn validate_pain001(
         indexed_path("PmtInf/ReqdExctnDt", i),
         "Requested execution date is required.",
       )
+    } else {
+      match data.execution_dates[i] {
+        Some(value) =>
+          if !is_iso_date(value) {
+            push_diagnostic(
+              diagnostics,
+              "EXECUTION_DATE_INVALID",
+              indexed_path("PmtInf/ReqdExctnDt", i),
+              "Requested execution date must use ISO 8601 date format.",
+            )
+          }
+        None => ()
+      }
     }
   }
   let seen_end_to_end_ids : Map[String, Bool] = Map([])
@@ -117,6 +238,19 @@ pub fn validate_pain001(
         indexed_path("CdtTrfTxInf/Amt/InstdAmt", i),
         "Instructed amount is required.",
       )
+    } else {
+      match data.instruction_amounts[i] {
+        Some(value) =>
+          if !is_decimal_amount(value) {
+            push_diagnostic(
+              diagnostics,
+              "INSTRUCTION_AMOUNT_INVALID",
+              indexed_path("CdtTrfTxInf/Amt/InstdAmt", i),
+              "Instructed amount must be a positive decimal number.",
+            )
+          }
+        None => ()
+      }
     }
     if !text_present(data.instruction_currencies[i]) {
       push_diagnostic(
@@ -125,11 +259,31 @@ pub fn validate_pain001(
         indexed_path("CdtTrfTxInf/Amt/InstdAmt/@Ccy", i),
         "Instruction currency is required.",
       )
+    } else {
+      match data.instruction_currencies[i] {
+        Some(value) =>
+          if !is_currency(value) {
+            push_diagnostic(
+              diagnostics,
+              "INSTRUCTION_CURRENCY_INVALID",
+              indexed_path("CdtTrfTxInf/Amt/InstdAmt/@Ccy", i),
+              "Instruction currency must be a three-letter uppercase code.",
+            )
+          }
+        None => ()
+      }
     }
   }
   match data.declared_transaction_count {
     Some(declared) => {
-      if declared != data.summary.transaction_count.to_string() {
+      if !is_unsigned_integer(declared) {
+        push_diagnostic(
+          diagnostics,
+          "TRANSACTION_COUNT_INVALID",
+          "GrpHdr/NbOfTxs",
+          "Declared transaction count must be an unsigned integer.",
+        )
+      } else if declared != data.summary.transaction_count.to_string() {
         push_diagnostic(
           diagnostics,
           "TRANSACTION_COUNT_MISMATCH",

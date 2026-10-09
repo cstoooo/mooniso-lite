@@ -8,7 +8,7 @@ repository always stays runnable.
 
 ## Current milestone
 
-Milestone 4: emit text, JSON and Markdown validation reports.
+Milestone 5: validate ISO date, datetime, currency and amount formats.
 
 ## Run
 
@@ -29,11 +29,11 @@ moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
 - Requested execution date is required.
 - End-to-end ID is required and must be unique.
 - Instructed amount and currency are required.
-- `NbOfTxs` must match the parsed transaction count.
+- `NbOfTxs` must be an unsigned integer and match the parsed transaction count.
+- Dates, datetime, currency and amount formats are checked.
 
 ## Roadmap
 
-- Milestone 5: add format validation and more regression fixtures
 - Milestone 6: add control sum validation
 
 

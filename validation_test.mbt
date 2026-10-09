@@ -70,3 +70,34 @@ test "validation report supports json and markdown" {
   assert_true(report.to_json().contains("\"valid\": true"))
   assert_true(report.to_markdown().contains("**Result:** VALID"))
 }
+
+///|
+fn invalid_format_pain001_xml() -> String {
+  let xml =
+  #|<?xml version="1.0" encoding="UTF-8"?>
+  #|<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+  #|  <CstmrCdtTrfInitn>
+  #|    <GrpHdr>
+  #|      <MsgId>MSG-FORMAT</MsgId>
+  #|      <CreDtTm>08-10-2026 12:00</CreDtTm>
+  #|      <NbOfTxs>many</NbOfTxs>
+  #|    </GrpHdr>
+  #|    <PmtInf>
+  #|      <PmtInfId>PMT-FORMAT</PmtInfId>
+  #|      <ReqdExctnDt>10/10/2026</ReqdExctnDt>
+  #|      <CdtTrfTxInf>
+  #|        <PmtId><EndToEndId>TX-FORMAT-1</EndToEndId></PmtId>
+  #|        <Amt><InstdAmt Ccy="eur">not-a-number</InstdAmt></Amt>
+  #|      </CdtTrfTxInf>
+  #|    </PmtInf>
+  #|  </CstmrCdtTrfInitn>
+  #|</Document>
+  xml
+}
+
+///|
+test "format validation catches invalid values" {
+  let report = @mooniso_lite.validate_pain001(invalid_format_pain001_xml())
+  assert_false(report.is_valid())
+  assert_true(report.diagnostics.length() >= 5)
+}

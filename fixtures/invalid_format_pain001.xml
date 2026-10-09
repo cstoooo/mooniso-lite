@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+  <CstmrCdtTrfInitn>
+    <GrpHdr>
+      <MsgId>MSG-FORMAT</MsgId>
+      <CreDtTm>08-10-2026 12:00</CreDtTm>
+      <NbOfTxs>many</NbOfTxs>
+    </GrpHdr>
+    <PmtInf>
+      <PmtInfId>PMT-FORMAT</PmtInfId>
+      <ReqdExctnDt>10/10/2026</ReqdExctnDt>
+      <CdtTrfTxInf>
+        <PmtId><EndToEndId>TX-FORMAT-1</EndToEndId></PmtId>
+        <Amt><InstdAmt Ccy="eur">not-a-number</InstdAmt></Amt>
+      </CdtTrfTxInf>
+    </PmtInf>
+  </CstmrCdtTrfInitn>
+</Document>
