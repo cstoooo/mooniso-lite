@@ -1,3 +1,5 @@
+![CI](https://github.com/cstoooo/mooniso-lite/actions/workflows/ci.yml/badge.svg)
+
 # MoonISO Lite
 
 MoonISO Lite is a MoonBit-native command-line tool for validating ISO 20022
