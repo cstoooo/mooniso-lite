@@ -100,16 +100,48 @@ fn is_decimal_amount(value : String) -> Bool {
   }
   let mut dot_count = 0
   let mut digit_count = 0
+  let mut fraction_digits = 0
+  let mut seen_dot = false
   for c in value {
     if is_digit(c) {
       digit_count += 1
+      if seen_dot {
+        fraction_digits += 1
+      }
     } else if c == '.' {
       dot_count += 1
+      seen_dot = true
     } else {
       return false
     }
   }
-  digit_count > 0 && dot_count <= 1
+  digit_count > 0 && dot_count <= 1 && fraction_digits <= 2
+}
+
+///|
+fn parse_amount_minor_units(value : String) -> Int? {
+  if !is_decimal_amount(value) {
+    return None
+  }
+  let mut units = 0
+  let mut fraction_digits = 0
+  let mut seen_dot = false
+  for c in value {
+    if c == '.' {
+      seen_dot = true
+    } else {
+      units = units * 10 + (c.to_int() - '0'.to_int())
+      if seen_dot {
+        fraction_digits += 1
+      }
+    }
+  }
+  if fraction_digits == 0 {
+    units = units * 100
+  } else if fraction_digits == 1 {
+    units = units * 10
+  }
+  Some(units)
 }
 
 ///|
@@ -205,6 +237,8 @@ pub fn validate_pain001(
     }
   }
   let seen_end_to_end_ids : Map[String, Bool] = Map([])
+  let mut amount_sum = 0
+  let mut all_amounts_valid = true
   for i = 0; i < data.end_to_end_ids.length(); i = i + 1 {
     let end_to_end_id = data.end_to_end_ids[i]
     if !text_present(end_to_end_id) {
@@ -241,13 +275,17 @@ pub fn validate_pain001(
     } else {
       match data.instruction_amounts[i] {
         Some(value) =>
-          if !is_decimal_amount(value) {
-            push_diagnostic(
-              diagnostics,
-              "INSTRUCTION_AMOUNT_INVALID",
-              indexed_path("CdtTrfTxInf/Amt/InstdAmt", i),
-              "Instructed amount must be a positive decimal number.",
-            )
+          match parse_amount_minor_units(value) {
+            Some(units) => amount_sum += units
+            None => {
+              all_amounts_valid = false
+              push_diagnostic(
+                diagnostics,
+                "INSTRUCTION_AMOUNT_INVALID",
+                indexed_path("CdtTrfTxInf/Amt/InstdAmt", i),
+                "Instructed amount must be a positive decimal number with up to two decimal places.",
+              )
+            }
           }
         None => ()
       }
@@ -273,6 +311,29 @@ pub fn validate_pain001(
         None => ()
       }
     }
+  }
+  match data.declared_control_sum {
+    Some(declared) => {
+      match parse_amount_minor_units(declared) {
+        Some(declared_sum) =>
+          if all_amounts_valid && declared_sum != amount_sum {
+            push_diagnostic(
+              diagnostics,
+              "CONTROL_SUM_MISMATCH",
+              "GrpHdr/CtrlSum",
+              "Declared control sum does not match the sum of instructed amounts.",
+            )
+          }
+        None =>
+          push_diagnostic(
+            diagnostics,
+            "CONTROL_SUM_INVALID",
+            "GrpHdr/CtrlSum",
+            "Declared control sum must be a decimal number with up to two decimal places.",
+          )
+      }
+    }
+    None => ()
   }
   match data.declared_transaction_count {
     Some(declared) => {

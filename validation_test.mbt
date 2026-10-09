@@ -8,6 +8,7 @@ fn valid_pain001_xml() -> String {
   #|      <MsgId>MSG-001</MsgId>
   #|      <CreDtTm>2026-10-08T12:00:00Z</CreDtTm>
   #|      <NbOfTxs>2</NbOfTxs>
+  #|      <CtrlSum>350.00</CtrlSum>
   #|    </GrpHdr>
   #|    <PmtInf>
   #|      <PmtInfId>PMT-001</PmtInfId>
@@ -100,4 +101,40 @@ test "format validation catches invalid values" {
   let report = @mooniso_lite.validate_pain001(invalid_format_pain001_xml())
   assert_false(report.is_valid())
   assert_true(report.diagnostics.length() >= 5)
+}
+
+///|
+fn invalid_control_sum_pain001_xml() -> String {
+  let xml =
+  #|<?xml version="1.0" encoding="UTF-8"?>
+  #|<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+  #|  <CstmrCdtTrfInitn>
+  #|    <GrpHdr>
+  #|      <MsgId>MSG-CTRL</MsgId>
+  #|      <CreDtTm>2026-10-08T12:00:00Z</CreDtTm>
+  #|      <NbOfTxs>2</NbOfTxs>
+  #|      <CtrlSum>999.99</CtrlSum>
+  #|    </GrpHdr>
+  #|    <PmtInf>
+  #|      <PmtInfId>PMT-CTRL</PmtInfId>
+  #|      <ReqdExctnDt>2026-10-10</ReqdExctnDt>
+  #|      <CdtTrfTxInf>
+  #|        <PmtId><EndToEndId>TX-CTRL-1</EndToEndId></PmtId>
+  #|        <Amt><InstdAmt Ccy="EUR">100.00</InstdAmt></Amt>
+  #|      </CdtTrfTxInf>
+  #|      <CdtTrfTxInf>
+  #|        <PmtId><EndToEndId>TX-CTRL-2</EndToEndId></PmtId>
+  #|        <Amt><InstdAmt Ccy="EUR">250.00</InstdAmt></Amt>
+  #|      </CdtTrfTxInf>
+  #|    </PmtInf>
+  #|  </CstmrCdtTrfInitn>
+  #|</Document>
+  xml
+}
+
+///|
+test "control sum mismatch is reported" {
+  let report = @mooniso_lite.validate_pain001(invalid_control_sum_pain001_xml())
+  assert_false(report.is_valid())
+  assert_true(report.to_json().contains("CONTROL_SUM_MISMATCH"))
 }

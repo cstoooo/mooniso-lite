@@ -17,6 +17,7 @@ priv struct Pain001Data {
   instruction_amounts : Array[String?]
   instruction_currencies : Array[String?]
   declared_transaction_count : String?
+  declared_control_sum : String?
 }
 
 ///|
@@ -46,6 +47,7 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
   let mut message_id : String? = None
   let mut creation_datetime : String? = None
   let mut declared_transaction_count : String? = None
+  let mut declared_control_sum : String? = None
   let payment_instruction_ids : Array[String?] = []
   let execution_dates : Array[String?] = []
   let end_to_end_ids : Array[String?] = []
@@ -128,6 +130,11 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
           declared_transaction_count = Some(content)
         } else if path_equals(
           path,
+          ["Document", "CstmrCdtTrfInitn", "GrpHdr", "CtrlSum"],
+        ) {
+          declared_control_sum = Some(content)
+        } else if path_equals(
+          path,
           ["Document", "CstmrCdtTrfInitn", "PmtInf", "PmtInfId"],
         ) {
           set_last(payment_instruction_ids, content)
@@ -185,6 +192,7 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
     instruction_amounts,
     instruction_currencies,
     declared_transaction_count,
+    declared_control_sum,
   }
 }
 

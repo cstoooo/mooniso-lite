@@ -8,7 +8,7 @@ repository always stays runnable.
 
 ## Current milestone
 
-Milestone 5: validate ISO date, datetime, currency and amount formats.
+Milestone 6: validate the declared control sum against instructed amounts.
 
 ## Run
 
@@ -31,10 +31,10 @@ moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
 - Instructed amount and currency are required.
 - `NbOfTxs` must be an unsigned integer and match the parsed transaction count.
 - Dates, datetime, currency and amount formats are checked.
+- `CtrlSum` must match the sum of instructed amounts when present.
 
 ## Roadmap
 
-- Milestone 6: add control sum validation
 
 
 ## License
