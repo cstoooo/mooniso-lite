@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+  <CstmrCdtTrfInitn>
+    <GrpHdr>
+      <MsgId></MsgId>
+    </GrpHdr>
+    <PmtInf>
+      <PmtInfId>PMT-001</PmtInfId>
+      <CdtTrfTxInf>
+        <PmtId><EndToEndId>TX-DUP</EndToEndId></PmtId>
+      </CdtTrfTxInf>
+      <CdtTrfTxInf>
+        <PmtId><EndToEndId>TX-DUP</EndToEndId></PmtId>
+      </CdtTrfTxInf>
+    </PmtInf>
+  </CstmrCdtTrfInitn>
+</Document>

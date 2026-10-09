@@ -8,7 +8,8 @@ repository always stays runnable.
 
 ## Current milestone
 
-Milestone 2: read a `pain.001.xml` file and print a basic summary.
+Milestone 3: validate required fields, duplicate end-to-end IDs and declared
+transaction counts.
 
 ## Run
 
@@ -16,22 +17,31 @@ Milestone 2: read a `pain.001.xml` file and print a basic summary.
 moon check
 moon test
 moon run cmd/main -- fixtures/valid_pain001.xml
+moon run cmd/main -- fixtures/invalid_pain001.xml
 ```
 
-Expected summary:
+Expected result:
 
 ```text
-Message ID: MSG-001
-Creation time: 2026-10-08T12:00:00Z
-Payment instructions: 1
-Transactions: 2
+Result: VALID
 ```
+
+## Rules implemented
+
+- Message ID is required.
+- Creation date time is required.
+- At least one payment instruction is required.
+- Payment instruction ID is required.
+- Requested execution date is required.
+- End-to-end ID is required and must be unique.
+- Instructed amount and currency are required.
+- `NbOfTxs` must match the parsed transaction count.
 
 ## Roadmap
 
-- Milestone 3: validate required fields and basic business rules
 - Milestone 4: emit JSON and Markdown reports
 - Milestone 5: add more fixtures and regression tests
+
 
 ## License
 

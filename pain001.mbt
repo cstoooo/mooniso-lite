@@ -8,6 +8,18 @@ pub struct Pain001Summary {
 }
 
 ///|
+/// Internal parse result used by summary and validation milestones.
+priv struct Pain001Data {
+  summary : Pain001Summary
+  payment_instruction_ids : Array[String?]
+  execution_dates : Array[String?]
+  end_to_end_ids : Array[String?]
+  instruction_amounts : Array[String?]
+  instruction_currencies : Array[String?]
+  declared_transaction_count : String?
+}
+
+///|
 fn path_equals(path : Array[String], expected : Array[String]) -> Bool {
   if path.length() != expected.length() {
     return false
@@ -21,37 +33,32 @@ fn path_equals(path : Array[String], expected : Array[String]) -> Bool {
 }
 
 ///|
-/// Parse a pain.001 XML document and collect the small summary needed by the
-/// first parsing milestone. Full validation and typed transaction models are
-/// intentionally left to later milestones.
-pub fn summarize_pain001(
-  xml_text : String,
-) -> Pain001Summary raise @xml.XmlError {
+fn set_last(values : Array[String?], value : String) -> Unit {
+  if values.length() > 0 {
+    values[values.length() - 1] = Some(value)
+  }
+}
+
+///|
+fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
   let reader = @xml.Reader::from_string(xml_text)
   let path : Array[String] = []
   let mut message_id : String? = None
   let mut creation_datetime : String? = None
-  let mut payment_instruction_count = 0
-  let mut transaction_count = 0
+  let mut declared_transaction_count : String? = None
+  let payment_instruction_ids : Array[String?] = []
+  let execution_dates : Array[String?] = []
+  let end_to_end_ids : Array[String?] = []
+  let instruction_amounts : Array[String?] = []
+  let instruction_currencies : Array[String?] = []
   for ;; {
     let event = reader.read_event()
     match event.kind {
       Start(element) => {
         path.push(element.name)
-        if path_equals(
-          path,
-          ["Document", "CstmrCdtTrfInitn", "GrpHdr", "MsgId"],
-        ) {
-          // The text event immediately following this element carries the value.
-        }
-        if path_equals(
-          path,
-          ["Document", "CstmrCdtTrfInitn", "GrpHdr", "CreDtTm"],
-        ) {
-          // The text event immediately following this element carries the value.
-        }
         if path_equals(path, ["Document", "CstmrCdtTrfInitn", "PmtInf"]) {
-          payment_instruction_count += 1
+          payment_instruction_ids.push(None)
+          execution_dates.push(None)
         }
         if path_equals(
           path,
@@ -62,7 +69,25 @@ pub fn summarize_pain001(
             "CdtTrfTxInf",
           ],
         ) {
-          transaction_count += 1
+          end_to_end_ids.push(None)
+          instruction_amounts.push(None)
+          instruction_currencies.push(None)
+        }
+        if path_equals(
+          path,
+          [
+            "Document",
+            "CstmrCdtTrfInitn",
+            "PmtInf",
+            "CdtTrfTxInf",
+            "Amt",
+            "InstdAmt",
+          ],
+        ) {
+          if instruction_currencies.length() > 0 {
+            instruction_currencies[instruction_currencies.length() - 1] =
+              element.get("Ccy")
+          }
         }
       }
       Empty(element) => {
@@ -74,9 +99,14 @@ pub fn summarize_pain001(
             "CstmrCdtTrfInitn",
             "PmtInf",
             "CdtTrfTxInf",
+            "Amt",
+            "InstdAmt",
           ],
         ) {
-          transaction_count += 1
+          if instruction_currencies.length() > 0 {
+            instruction_currencies[instruction_currencies.length() - 1] =
+              element.get("Ccy")
+          }
         }
         let _ = path.remove(path.length() - 1)
       }
@@ -86,12 +116,50 @@ pub fn summarize_pain001(
           ["Document", "CstmrCdtTrfInitn", "GrpHdr", "MsgId"],
         ) {
           message_id = Some(content)
-        }
-        if path_equals(
+        } else if path_equals(
           path,
           ["Document", "CstmrCdtTrfInitn", "GrpHdr", "CreDtTm"],
         ) {
           creation_datetime = Some(content)
+        } else if path_equals(
+          path,
+          ["Document", "CstmrCdtTrfInitn", "GrpHdr", "NbOfTxs"],
+        ) {
+          declared_transaction_count = Some(content)
+        } else if path_equals(
+          path,
+          ["Document", "CstmrCdtTrfInitn", "PmtInf", "PmtInfId"],
+        ) {
+          set_last(payment_instruction_ids, content)
+        } else if path_equals(
+          path,
+          ["Document", "CstmrCdtTrfInitn", "PmtInf", "ReqdExctnDt"],
+        ) {
+          set_last(execution_dates, content)
+        } else if path_equals(
+          path,
+          [
+            "Document",
+            "CstmrCdtTrfInitn",
+            "PmtInf",
+            "CdtTrfTxInf",
+            "PmtId",
+            "EndToEndId",
+          ],
+        ) {
+          set_last(end_to_end_ids, content)
+        } else if path_equals(
+          path,
+          [
+            "Document",
+            "CstmrCdtTrfInitn",
+            "PmtInf",
+            "CdtTrfTxInf",
+            "Amt",
+            "InstdAmt",
+          ],
+        ) {
+          set_last(instruction_amounts, content)
         }
       }
       End(_) => {
@@ -103,12 +171,28 @@ pub fn summarize_pain001(
       _ => ()
     }
   }
-  {
+  let summary = {
     message_id,
     creation_datetime,
-    payment_instruction_count,
-    transaction_count,
+    payment_instruction_count: payment_instruction_ids.length(),
+    transaction_count: end_to_end_ids.length(),
   }
+  {
+    summary,
+    payment_instruction_ids,
+    execution_dates,
+    end_to_end_ids,
+    instruction_amounts,
+    instruction_currencies,
+    declared_transaction_count,
+  }
+}
+
+///|
+pub fn summarize_pain001(
+  xml_text : String,
+) -> Pain001Summary raise @xml.XmlError {
+  parse_pain001_data(xml_text).summary
 }
 
 ///|

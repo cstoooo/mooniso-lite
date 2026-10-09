@@ -8,11 +8,14 @@
     </GrpHdr>
     <PmtInf>
       <PmtInfId>PMT-001</PmtInfId>
+      <ReqdExctnDt>2026-10-10</ReqdExctnDt>
       <CdtTrfTxInf>
         <PmtId><EndToEndId>TX-001</EndToEndId></PmtId>
+        <Amt><InstdAmt Ccy="EUR">100.00</InstdAmt></Amt>
       </CdtTrfTxInf>
       <CdtTrfTxInf>
         <PmtId><EndToEndId>TX-002</EndToEndId></PmtId>
+        <Amt><InstdAmt Ccy="EUR">250.00</InstdAmt></Amt>
       </CdtTrfTxInf>
     </PmtInf>
   </CstmrCdtTrfInitn>
