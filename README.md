@@ -4,9 +4,18 @@
 
 MoonBit command-line validator for ISO 20022 `pain.001` payment messages.
 
+## Implementation
+
+- Project-local XML pull reader in `xml_reader.mbt`
+- Project-local fixed-point decimal module in `decimal.mbt`
+- Rule and report module in `validation.mbt`
+- File input through `moonbitlang/x/fs`
+- CLI in `cmd/main`
+- 15 unit tests and 5 fixture messages
+
 ## Status
 
-Version: 0.2.0
+Version: 0.3.0
 
 Current support: `pain.001.001.03` core fields and rules.
 

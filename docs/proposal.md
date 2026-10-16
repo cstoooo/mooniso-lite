@@ -26,6 +26,8 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 - 校验 IBAN 校验和和 BIC 格式
 - 校验 `NbOfTxs`
 - 校验 `CtrlSum`
+- 自研 XML 事件读取器
+- 自研定点十进制解析、比较和求和
 - 输出 text、JSON、Markdown
 - 提供有效、无效和格式错误示例
 - 提供 `scripts/check.sh`
@@ -38,8 +40,9 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 ## 实现
 
 - 主要语言：MoonBit
-- XML 解析：MoonBit XML pull parser
-- 文件读取：MoonBit 文件系统包
+- XML 解析：项目自研 XML pull reader（`xml_reader.mbt`）
+- 十进制处理：项目自研定点 Decimal 模块（`decimal.mbt`）
+- 文件读取：`moonbitlang/x/fs`
 - 测试：`moon test`
 - 云端检查：GitHub Actions
 

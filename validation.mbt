@@ -32,11 +32,6 @@ fn push_diagnostic(
 
 
 ///|
-fn is_digit(c : Char) -> Bool {
-  c >= '0' && c <= '9'
-}
-
-///|
 fn is_iso_date(value : String) -> Bool {
   if value.length() != 10 {
     return false
@@ -91,41 +86,6 @@ fn is_currency(value : String) -> Bool {
     }
   }
   true
-}
-
-///|
-fn parse_amount_minor_units(value : String) -> Int? {
-  if value == "" || value[0] == '.' || value[value.length() - 1] == '.' {
-    return None
-  }
-  let mut units = 0
-  let mut dot_count = 0
-  let mut digit_count = 0
-  let mut fraction_digits = 0
-  let mut seen_dot = false
-  for c in value {
-    if is_digit(c) {
-      digit_count += 1
-      units = units * 10 + (c.to_int() - '0'.to_int())
-      if seen_dot {
-        fraction_digits += 1
-      }
-    } else if c == '.' {
-      dot_count += 1
-      seen_dot = true
-    } else {
-      return None
-    }
-  }
-  if digit_count == 0 || dot_count > 1 || fraction_digits > 2 {
-    return None
-  }
-  if fraction_digits == 0 {
-    units = units * 100
-  } else if fraction_digits == 1 {
-    units = units * 10
-  }
-  Some(units)
 }
 
 ///|
@@ -224,7 +184,7 @@ fn indexed_path(base : String, index : Int) -> String {
 ///|
 pub fn validate_pain001(
   xml_text : String,
-) -> ValidationReport raise @xml.XmlError {
+) -> ValidationReport raise XmlParseError {
   let data = parse_pain001_data(xml_text)
   let diagnostics : Array[Diagnostic] = []
   if !text_present(data.summary.message_id) {
@@ -383,7 +343,7 @@ pub fn validate_pain001(
     }
   }
   let seen_end_to_end_ids : Map[String, Bool] = Map([])
-  let mut amount_sum = 0
+  let mut amount_sum = Decimal::zero()
   let mut all_amounts_valid = true
   for i = 0; i < data.end_to_end_ids.length(); i = i + 1 {
     let end_to_end_id = data.end_to_end_ids[i]
@@ -429,8 +389,8 @@ pub fn validate_pain001(
     } else {
       match data.instruction_amounts[i] {
         Some(value) =>
-          match parse_amount_minor_units(value) {
-            Some(units) => amount_sum += units
+          match Decimal::parse(value) {
+            Some(decimal) => amount_sum = amount_sum.add(decimal)
             None => {
               all_amounts_valid = false
               push_diagnostic(
@@ -492,9 +452,9 @@ pub fn validate_pain001(
   }
   match data.declared_control_sum {
     Some(declared) => {
-      match parse_amount_minor_units(declared) {
+      match Decimal::parse(declared) {
         Some(declared_sum) =>
-          if all_amounts_valid && declared_sum != amount_sum {
+          if all_amounts_valid && declared_sum.compare(amount_sum) != 0 {
             push_diagnostic(
               diagnostics,
               "CONTROL_SUM_MISMATCH",

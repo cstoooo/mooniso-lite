@@ -47,8 +47,8 @@ fn set_last(values : Array[String?], value : String) -> Unit {
 }
 
 ///|
-fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
-  let reader = @xml.Reader::from_string(xml_text)
+fn parse_pain001_data(xml_text : String) -> Pain001Data raise XmlParseError {
+  let reader = XmlReader::from_string(xml_text)
   let path : Array[String] = []
   let mut message_id : String? = None
   let mut creation_datetime : String? = None
@@ -253,7 +253,6 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
         }
       }
       Eof => break
-      _ => ()
     }
   }
   let summary = {
@@ -283,7 +282,7 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
 ///|
 pub fn summarize_pain001(
   xml_text : String,
-) -> Pain001Summary raise @xml.XmlError {
+) -> Pain001Summary raise XmlParseError {
   parse_pain001_data(xml_text).summary
 }
 
