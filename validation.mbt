@@ -94,10 +94,11 @@ fn is_currency(value : String) -> Bool {
 }
 
 ///|
-fn is_decimal_amount(value : String) -> Bool {
+fn parse_amount_minor_units(value : String) -> Int? {
   if value == "" || value[0] == '.' || value[value.length() - 1] == '.' {
-    return false
+    return None
   }
+  let mut units = 0
   let mut dot_count = 0
   let mut digit_count = 0
   let mut fraction_digits = 0
@@ -105,6 +106,7 @@ fn is_decimal_amount(value : String) -> Bool {
   for c in value {
     if is_digit(c) {
       digit_count += 1
+      units = units * 10 + (c.to_int() - '0'.to_int())
       if seen_dot {
         fraction_digits += 1
       }
@@ -112,29 +114,11 @@ fn is_decimal_amount(value : String) -> Bool {
       dot_count += 1
       seen_dot = true
     } else {
-      return false
+      return None
     }
   }
-  digit_count > 0 && dot_count <= 1 && fraction_digits <= 2
-}
-
-///|
-fn parse_amount_minor_units(value : String) -> Int? {
-  if !is_decimal_amount(value) {
+  if digit_count == 0 || dot_count > 1 || fraction_digits > 2 {
     return None
-  }
-  let mut units = 0
-  let mut fraction_digits = 0
-  let mut seen_dot = false
-  for c in value {
-    if c == '.' {
-      seen_dot = true
-    } else {
-      units = units * 10 + (c.to_int() - '0'.to_int())
-      if seen_dot {
-        fraction_digits += 1
-      }
-    }
   }
   if fraction_digits == 0 {
     units = units * 100
@@ -142,6 +126,81 @@ fn parse_amount_minor_units(value : String) -> Int? {
     units = units * 10
   }
   Some(units)
+}
+
+///|
+fn is_upper_alpha(c : Char) -> Bool {
+  c >= 'A' && c <= 'Z'
+}
+
+///|
+fn is_alphanumeric(c : Char) -> Bool {
+  is_digit(c) || is_upper_alpha(c)
+}
+
+///|
+fn exceeds_max35(value : String) -> Bool {
+  value.length() > 35
+}
+
+///|
+fn is_iban(value : String) -> Bool {
+  if value.length() < 15 || value.length() > 34 {
+    return false
+  }
+  for i = 0; i < 4; i = i + 1 {
+    let c = value[i].unsafe_to_char()
+    if i < 2 {
+      if !is_upper_alpha(c) {
+        return false
+      }
+    } else if !is_digit(c) {
+      return false
+    }
+  }
+  for i = 4; i < value.length(); i = i + 1 {
+    if !is_alphanumeric(value[i].unsafe_to_char()) {
+      return false
+    }
+  }
+  let mut remainder = 0
+  for i = 0; i < value.length(); i = i + 1 {
+    let c = value[(i + 4) % value.length()].unsafe_to_char()
+    if is_digit(c) {
+      remainder = (remainder * 10 + (c.to_int() - '0'.to_int())) % 97
+    } else {
+      remainder = (remainder * 100 + (c.to_int() - 'A'.to_int() + 10)) % 97
+    }
+  }
+  remainder == 1
+}
+
+///|
+fn is_bic(value : String) -> Bool {
+  if value.length() != 8 && value.length() != 11 {
+    return false
+  }
+  for i = 0; i < 6; i = i + 1 {
+    if !is_upper_alpha(value[i].unsafe_to_char()) {
+      return false
+    }
+  }
+  for i = 6; i < value.length(); i = i + 1 {
+    if !is_alphanumeric(value[i].unsafe_to_char()) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+fn is_payment_method(value : String) -> Bool {
+  value == "TRF" || value == "CHK" || value == "TRA"
+}
+
+///|
+fn is_charge_bearer(value : String) -> Bool {
+  value == "DEBT" || value == "CRED" || value == "SHAR" || value == "SLEV"
 }
 
 ///|
@@ -175,6 +234,19 @@ pub fn validate_pain001(
       "GrpHdr/MsgId",
       "Message ID is required.",
     )
+  } else {
+    match data.summary.message_id {
+      Some(value) =>
+        if exceeds_max35(value) {
+          push_diagnostic(
+            diagnostics,
+            "MSG_ID_TOO_LONG",
+            "GrpHdr/MsgId",
+            "Message ID must not exceed 35 characters.",
+          )
+        }
+      None => ()
+    }
   }
   if !text_present(data.summary.creation_datetime) {
     push_diagnostic(
@@ -205,14 +277,40 @@ pub fn validate_pain001(
       "At least one payment instruction is required.",
     )
   }
+  let seen_payment_instruction_ids : Map[String, Bool] = Map([])
   for i = 0; i < data.payment_instruction_ids.length(); i = i + 1 {
-    if !text_present(data.payment_instruction_ids[i]) {
+    let payment_instruction_id = data.payment_instruction_ids[i]
+    if !text_present(payment_instruction_id) {
       push_diagnostic(
         diagnostics,
         "PAYMENT_INSTRUCTION_ID_MISSING",
         indexed_path("PmtInf/PmtInfId", i),
         "Payment instruction ID is required.",
       )
+    } else {
+      match payment_instruction_id {
+        Some(value) => {
+          if exceeds_max35(value) {
+            push_diagnostic(
+              diagnostics,
+              "PAYMENT_INSTRUCTION_ID_TOO_LONG",
+              indexed_path("PmtInf/PmtInfId", i),
+              "Payment instruction ID must not exceed 35 characters.",
+            )
+          }
+          if seen_payment_instruction_ids.contains(value) {
+            push_diagnostic(
+              diagnostics,
+              "PAYMENT_INSTRUCTION_ID_DUPLICATE",
+              indexed_path("PmtInf/PmtInfId", i),
+              "Payment instruction ID is duplicated: " + value,
+            )
+          } else {
+            seen_payment_instruction_ids.set(value, true)
+          }
+        }
+        None => ()
+      }
     }
     if !text_present(data.execution_dates[i]) {
       push_diagnostic(
@@ -235,6 +333,54 @@ pub fn validate_pain001(
         None => ()
       }
     }
+    match data.payment_methods[i] {
+      Some(value) =>
+        if !is_payment_method(value) {
+          push_diagnostic(
+            diagnostics,
+            "PAYMENT_METHOD_INVALID",
+            indexed_path("PmtInf/PmtMtd", i),
+            "Payment method must be one of TRF, CHK or TRA.",
+          )
+        }
+      None => ()
+    }
+    match data.charge_bearers[i] {
+      Some(value) =>
+        if !is_charge_bearer(value) {
+          push_diagnostic(
+            diagnostics,
+            "CHARGE_BEARER_INVALID",
+            indexed_path("PmtInf/ChrgBr", i),
+            "Charge bearer must be one of DEBT, CRED, SHAR or SLEV.",
+          )
+        }
+      None => ()
+    }
+    match data.debtor_ibans[i] {
+      Some(value) =>
+        if !is_iban(value) {
+          push_diagnostic(
+            diagnostics,
+            "DEBTOR_IBAN_INVALID",
+            indexed_path("PmtInf/DbtrAcct/Id/IBAN", i),
+            "Debtor IBAN failed format or checksum validation.",
+          )
+        }
+      None => ()
+    }
+    match data.debtor_bics[i] {
+      Some(value) =>
+        if !is_bic(value) {
+          push_diagnostic(
+            diagnostics,
+            "DEBTOR_BIC_INVALID",
+            indexed_path("PmtInf/DbtrAgt/FinInstnId/BIC", i),
+            "Debtor BIC must be 8 or 11 uppercase alphanumeric characters.",
+          )
+        }
+      None => ()
+    }
   }
   let seen_end_to_end_ids : Map[String, Bool] = Map([])
   let mut amount_sum = 0
@@ -251,6 +397,14 @@ pub fn validate_pain001(
     } else {
       match end_to_end_id {
         Some(value) => {
+          if exceeds_max35(value) {
+            push_diagnostic(
+              diagnostics,
+              "END_TO_END_ID_TOO_LONG",
+              indexed_path("CdtTrfTxInf/PmtId/EndToEndId", i),
+              "End-to-end ID must not exceed 35 characters.",
+            )
+          }
           if seen_end_to_end_ids.contains(value) {
             push_diagnostic(
               diagnostics,
@@ -310,6 +464,30 @@ pub fn validate_pain001(
           }
         None => ()
       }
+    }
+    match data.creditor_ibans[i] {
+      Some(value) =>
+        if !is_iban(value) {
+          push_diagnostic(
+            diagnostics,
+            "CREDITOR_IBAN_INVALID",
+            indexed_path("CdtTrfTxInf/CdtrAcct/Id/IBAN", i),
+            "Creditor IBAN failed format or checksum validation.",
+          )
+        }
+      None => ()
+    }
+    match data.creditor_bics[i] {
+      Some(value) =>
+        if !is_bic(value) {
+          push_diagnostic(
+            diagnostics,
+            "CREDITOR_BIC_INVALID",
+            indexed_path("CdtTrfTxInf/CdtrAgt/FinInstnId/BIC", i),
+            "Creditor BIC must be 8 or 11 uppercase alphanumeric characters.",
+          )
+        }
+      None => ()
     }
   }
   match data.declared_control_sum {

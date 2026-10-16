@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+  <CstmrCdtTrfInitn>
+    <GrpHdr>
+      <MsgId>MSG-IDENTITY-IDENTITY-IDENTITY-12345</MsgId>
+      <CreDtTm>2026-10-08T12:00:00Z</CreDtTm>
+      <NbOfTxs>2</NbOfTxs>
+      <CtrlSum>20.00</CtrlSum>
+    </GrpHdr>
+    <PmtInf>
+      <PmtInfId>PMT-DUP</PmtInfId>
+      <PmtMtd>XXX</PmtMtd>
+      <ChrgBr>NONE</ChrgBr>
+      <ReqdExctnDt>2026-10-10</ReqdExctnDt>
+      <DbtrAgt><FinInstnId><BIC>BAD</BIC></FinInstnId></DbtrAgt>
+      <DbtrAcct><Id><IBAN>DE00370400440532013000</IBAN></Id></DbtrAcct>
+      <CdtTrfTxInf>
+        <PmtId><EndToEndId>TX-ID-1</EndToEndId></PmtId>
+        <Amt><InstdAmt Ccy="EUR">10.00</InstdAmt></Amt>
+        <CdtrAgt><FinInstnId><BIC>bad</BIC></FinInstnId></CdtrAgt>
+        <CdtrAcct><Id><IBAN>DE00370400440532013000</IBAN></Id></CdtrAcct>
+      </CdtTrfTxInf>
+    </PmtInf>
+    <PmtInf>
+      <PmtInfId>PMT-DUP</PmtInfId>
+      <ReqdExctnDt>2026-10-10</ReqdExctnDt>
+      <CdtTrfTxInf>
+        <PmtId><EndToEndId>TX-ID-2</EndToEndId></PmtId>
+        <Amt><InstdAmt Ccy="EUR">10.00</InstdAmt></Amt>
+      </CdtTrfTxInf>
+    </PmtInf>
+  </CstmrCdtTrfInitn>
+</Document>

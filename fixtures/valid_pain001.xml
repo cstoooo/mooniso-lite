@@ -9,14 +9,22 @@
     </GrpHdr>
     <PmtInf>
       <PmtInfId>PMT-001</PmtInfId>
+      <PmtMtd>TRF</PmtMtd>
+      <ChrgBr>SLEV</ChrgBr>
       <ReqdExctnDt>2026-10-10</ReqdExctnDt>
+      <DbtrAgt><FinInstnId><BIC>DEUTDEFF</BIC></FinInstnId></DbtrAgt>
+      <DbtrAcct><Id><IBAN>DE89370400440532013000</IBAN></Id></DbtrAcct>
       <CdtTrfTxInf>
         <PmtId><EndToEndId>TX-001</EndToEndId></PmtId>
         <Amt><InstdAmt Ccy="EUR">100.00</InstdAmt></Amt>
+        <CdtrAgt><FinInstnId><BIC>BNPAFRPPXXX</BIC></FinInstnId></CdtrAgt>
+        <CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct>
       </CdtTrfTxInf>
       <CdtTrfTxInf>
         <PmtId><EndToEndId>TX-002</EndToEndId></PmtId>
         <Amt><InstdAmt Ccy="EUR">250.00</InstdAmt></Amt>
+        <CdtrAgt><FinInstnId><BIC>BNPAFRPPXXX</BIC></FinInstnId></CdtrAgt>
+        <CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct>
       </CdtTrfTxInf>
     </PmtInf>
   </CstmrCdtTrfInitn>

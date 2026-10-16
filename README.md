@@ -6,6 +6,8 @@ MoonBit command-line validator for ISO 20022 `pain.001` payment messages.
 
 ## Status
 
+Version: 0.2.0
+
 Current support: `pain.001.001.03` core fields and rules.
 
 ## Run
@@ -28,10 +30,13 @@ moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
 - At least one payment instruction is required.
 - Payment instruction ID is required.
 - Requested execution date is required.
-- End-to-end ID is required and must be unique.
+- End-to-end ID is required, must not exceed 35 characters and must be unique.
+- Payment instruction ID must not exceed 35 characters and must be unique.
 - Instructed amount and currency are required.
 - `NbOfTxs` must be an unsigned integer and match the parsed transaction count.
 - Date, datetime, currency and amount formats are checked.
+- Payment method and charge bearer values are checked.
+- IBAN checksum and BIC format are checked when present.
 - `CtrlSum` must match the sum of instructed amounts when present.
 
 ## License

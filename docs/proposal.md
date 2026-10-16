@@ -19,7 +19,11 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 - 提取消息 ID、创建时间、付款指令数和交易数
 - 校验必填字段
 - 校验 `EndToEndId` 唯一性
+- 校验 `PmtInfId` 唯一性
+- 校验 `MsgId`、`PmtInfId` 和 `EndToEndId` 最大长度
 - 校验日期、日期时间、金额和币种格式
+- 校验 `PmtMtd` 和 `ChrgBr` 枚举
+- 校验 IBAN 校验和和 BIC 格式
 - 校验 `NbOfTxs`
 - 校验 `CtrlSum`
 - 输出 text、JSON、Markdown
@@ -52,7 +56,7 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 ## 后续
 
 - 增加 `pain.002`、`pacs.008`、`camt.053`
-- 增加 IBAN、BIC 和 ISO 4217 规则
+- 增加 ISO 4217 币种小数位规则
 - 增加对账功能
 - 增加 HTML 报告
 

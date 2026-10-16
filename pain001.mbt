@@ -16,6 +16,12 @@ priv struct Pain001Data {
   end_to_end_ids : Array[String?]
   instruction_amounts : Array[String?]
   instruction_currencies : Array[String?]
+  payment_methods : Array[String?]
+  charge_bearers : Array[String?]
+  debtor_ibans : Array[String?]
+  debtor_bics : Array[String?]
+  creditor_ibans : Array[String?]
+  creditor_bics : Array[String?]
   declared_transaction_count : String?
   declared_control_sum : String?
 }
@@ -53,6 +59,12 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
   let end_to_end_ids : Array[String?] = []
   let instruction_amounts : Array[String?] = []
   let instruction_currencies : Array[String?] = []
+  let payment_methods : Array[String?] = []
+  let charge_bearers : Array[String?] = []
+  let debtor_ibans : Array[String?] = []
+  let debtor_bics : Array[String?] = []
+  let creditor_ibans : Array[String?] = []
+  let creditor_bics : Array[String?] = []
   for ;; {
     let event = reader.read_event()
     match event.kind {
@@ -61,6 +73,10 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
         if path_equals(path, ["Document", "CstmrCdtTrfInitn", "PmtInf"]) {
           payment_instruction_ids.push(None)
           execution_dates.push(None)
+          payment_methods.push(None)
+          charge_bearers.push(None)
+          debtor_ibans.push(None)
+          debtor_bics.push(None)
         }
         if path_equals(
           path,
@@ -74,6 +90,8 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
           end_to_end_ids.push(None)
           instruction_amounts.push(None)
           instruction_currencies.push(None)
+          creditor_ibans.push(None)
+          creditor_bics.push(None)
         }
         if path_equals(
           path,
@@ -145,6 +163,40 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
           set_last(execution_dates, content)
         } else if path_equals(
           path,
+          ["Document", "CstmrCdtTrfInitn", "PmtInf", "PmtMtd"],
+        ) {
+          set_last(payment_methods, content)
+        } else if path_equals(
+          path,
+          ["Document", "CstmrCdtTrfInitn", "PmtInf", "ChrgBr"],
+        ) {
+          set_last(charge_bearers, content)
+        } else if path_equals(
+          path,
+          [
+            "Document",
+            "CstmrCdtTrfInitn",
+            "PmtInf",
+            "DbtrAcct",
+            "Id",
+            "IBAN",
+          ],
+        ) {
+          set_last(debtor_ibans, content)
+        } else if path_equals(
+          path,
+          [
+            "Document",
+            "CstmrCdtTrfInitn",
+            "PmtInf",
+            "DbtrAgt",
+            "FinInstnId",
+            "BIC",
+          ],
+        ) {
+          set_last(debtor_bics, content)
+        } else if path_equals(
+          path,
           [
             "Document",
             "CstmrCdtTrfInitn",
@@ -155,6 +207,32 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
           ],
         ) {
           set_last(end_to_end_ids, content)
+        } else if path_equals(
+          path,
+          [
+            "Document",
+            "CstmrCdtTrfInitn",
+            "PmtInf",
+            "CdtTrfTxInf",
+            "CdtrAcct",
+            "Id",
+            "IBAN",
+          ],
+        ) {
+          set_last(creditor_ibans, content)
+        } else if path_equals(
+          path,
+          [
+            "Document",
+            "CstmrCdtTrfInitn",
+            "PmtInf",
+            "CdtTrfTxInf",
+            "CdtrAgt",
+            "FinInstnId",
+            "BIC",
+          ],
+        ) {
+          set_last(creditor_bics, content)
         } else if path_equals(
           path,
           [
@@ -191,6 +269,12 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise @xml.XmlError {
     end_to_end_ids,
     instruction_amounts,
     instruction_currencies,
+    payment_methods,
+    charge_bearers,
+    debtor_ibans,
+    debtor_bics,
+    creditor_ibans,
+    creditor_bics,
     declared_transaction_count,
     declared_control_sum,
   }
