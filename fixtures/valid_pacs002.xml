@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10">
+  <FIToFIPmtStsRpt>
+    <GrpHdr>
+      <MsgId>PST-001</MsgId>
+      <CreDtTm>2026-10-16T08:00:00Z</CreDtTm>
+    </GrpHdr>
+    <OrgnlGrpInf>
+      <OrgnlMsgId>PACS-001</OrgnlMsgId>
+    </OrgnlGrpInf>
+    <TxInfAndSts>
+      <OrgnlEndToEndId>TX-001</OrgnlEndToEndId>
+      <TxSts>ACSP</TxSts>
+    </TxInfAndSts>
+    <TxInfAndSts>
+      <OrgnlEndToEndId>TX-002</OrgnlEndToEndId>
+      <TxSts>ACSC</TxSts>
+    </TxInfAndSts>
+  </FIToFIPmtStsRpt>
+</Document>

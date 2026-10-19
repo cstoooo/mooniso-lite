@@ -29,6 +29,8 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 - 自研 XML 事件读取器
 - 自研定点十进制解析、比较和求和
 - 输出 text、JSON、Markdown
+- 支持 `pain.002`、`pacs.008`、`pacs.002` 和 `camt.053` 的基础解析与校验
+- 支持 `pain.001` 与状态报告交易按 `EndToEndId` 对账
 - 提供有效、无效和格式错误示例
 - 提供 `scripts/check.sh`
 
@@ -58,9 +60,9 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 
 ## 后续
 
-- 增加 `pain.002`、`pacs.008`、`camt.053`
 - 增加 ISO 4217 币种小数位规则
-- 增加对账功能
+- 增加更完整的交易状态和原因码校验
+- 增加 `camt.053` 借贷方向、余额和账期校验
 - 增加 HTML 报告
 
 ## 合规

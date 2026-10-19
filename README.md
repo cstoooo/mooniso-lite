@@ -8,16 +8,18 @@ MoonBit command-line validator for ISO 20022 `pain.001` payment messages.
 
 - Project-local XML pull reader in `xml_reader.mbt`
 - Project-local fixed-point decimal module in `decimal.mbt`
-- Rule and report module in `validation.mbt`
+- Flat XML field extractor in `flat_xml.mbt`
+- Multi-message validation in `message.mbt`
+- Payment reconciliation in `reconcile.mbt`
 - File input through `moonbitlang/x/fs`
 - CLI in `cmd/main`
-- 15 unit tests and 5 fixture messages
+- 20 unit tests and 9 fixture messages
 
 ## Status
 
-Version: 0.3.0
+Version: 0.4.0
 
-Current support: `pain.001.001.03` core fields and rules.
+Current support: `pain.001`, `pain.002`, `pacs.008`, `pacs.002` and `camt.053`.
 
 ## Run
 
@@ -30,6 +32,9 @@ moon test
 moon run cmd/main -- fixtures/valid_pain001.xml
 moon run cmd/main -- --format json fixtures/valid_pain001.xml
 moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
+moon run cmd/main -- fixtures/valid_pain002.xml
+moon run cmd/main -- fixtures/valid_camt053.xml
+moon run cmd/main -- reconcile fixtures/valid_pain001.xml fixtures/valid_pain002.xml
 ```
 
 ## Rules
@@ -47,6 +52,10 @@ moon run cmd/main -- --format markdown fixtures/invalid_pain001.xml
 - Payment method and charge bearer values are checked.
 - IBAN checksum and BIC format are checked when present.
 - `CtrlSum` must match the sum of instructed amounts when present.
+- Status reports validate `OrgnlEndToEndId`, `TxSts` and duplicate status entries.
+- `pacs.008` validates end-to-end IDs, settlement amounts and currencies.
+- `camt.053` validates statement entries, amounts and currencies.
+- `reconcile` matches `pain.001` transactions with status report entries.
 
 ## License
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">
+  <FIToFICstmrCdtTrf>
+    <GrpHdr>
+      <MsgId>PACS-001</MsgId>
+      <CreDtTm>2026-10-16T08:00:00Z</CreDtTm>
+    </GrpHdr>
+    <CdtTrfTxInf>
+      <PmtId><EndToEndId>TX-001</EndToEndId></PmtId>
+      <IntrBkSttlmAmt Ccy="EUR">100.00</IntrBkSttlmAmt>
+    </CdtTrfTxInf>
+    <CdtTrfTxInf>
+      <PmtId><EndToEndId>TX-002</EndToEndId></PmtId>
+      <IntrBkSttlmAmt Ccy="EUR">250.00</IntrBkSttlmAmt>
+    </CdtTrfTxInf>
+  </FIToFICstmrCdtTrf>
+</Document>
