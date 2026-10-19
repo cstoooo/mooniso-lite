@@ -46,6 +46,7 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 - 十进制处理：项目自研定点 Decimal 模块（`decimal.mbt`）
 - 文件读取：`moonbitlang/x/fs`
 - 测试：`moon test`
+- 测试数量：38 个单元测试
 - 云端检查：GitHub Actions
 
 ## 验收

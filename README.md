@@ -13,7 +13,7 @@ MoonBit command-line validator for ISO 20022 `pain.001` payment messages.
 - Payment reconciliation in `reconcile.mbt`
 - File input through `moonbitlang/x/fs`
 - CLI in `cmd/main`
-- 20 unit tests and 9 fixture messages
+- 38 unit tests and 9 fixture messages
 
 ## Status
 

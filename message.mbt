@@ -198,7 +198,8 @@ pub fn validate_message(
     }
     Pacs008 => {
       let ids = texts_by_suffix(fields, "/CdtTrfTxInf/PmtId/EndToEndId")
-      let amounts = elements_by_suffix(fields, "/CdtTrfTxInf/IntrBkSttlmAmt")
+      let amount_values = texts_by_suffix(fields, "/CdtTrfTxInf/IntrBkSttlmAmt")
+      let amount_elements = elements_by_suffix(fields, "/CdtTrfTxInf/IntrBkSttlmAmt")
       let seen : Map[String, Bool] = Map([])
       for id in ids {
         if seen.contains(id) {
@@ -212,19 +213,25 @@ pub fn validate_message(
           seen.set(id, true)
         }
       }
-      for field in amounts {
-        match field.text {
-          Some(value) =>
-            if Decimal::parse(value) is None {
-              push_diagnostic(
-                diagnostics,
-                "SETTLEMENT_AMOUNT_INVALID",
-                "CdtTrfTxInf/IntrBkSttlmAmt",
-                "Settlement amount must be a decimal with up to two decimal places.",
-              )
-            }
-          None => ()
+      if amount_values.length() != amount_elements.length() {
+        push_diagnostic(
+          diagnostics,
+          "SETTLEMENT_AMOUNT_MISSING",
+          "CdtTrfTxInf/IntrBkSttlmAmt",
+          "Each settlement amount element must contain a value.",
+        )
+      }
+      for value in amount_values {
+        if Decimal::parse(value) is None {
+          push_diagnostic(
+            diagnostics,
+            "SETTLEMENT_AMOUNT_INVALID",
+            "CdtTrfTxInf/IntrBkSttlmAmt",
+            "Settlement amount must be a decimal with up to two decimal places.",
+          )
         }
+      }
+      for field in amount_elements {
         match field.get_attribute("Ccy") {
           Some(value) =>
             if !is_currency(value) {
@@ -246,20 +253,27 @@ pub fn validate_message(
       }
     }
     Camt053 => {
-      let amount_fields = elements_by_suffix(fields, "/Ntry/Amt")
-      for field in amount_fields {
-        match field.text {
-          Some(value) =>
-            if Decimal::parse(value) is None {
-              push_diagnostic(
-                diagnostics,
-                "STATEMENT_AMOUNT_INVALID",
-                "Ntry/Amt",
-                "Statement entry amount must be a decimal with up to two decimal places.",
-              )
-            }
-          None => ()
+      let amount_values = texts_by_suffix(fields, "/Ntry/Amt")
+      let amount_elements = elements_by_suffix(fields, "/Ntry/Amt")
+      if amount_values.length() != amount_elements.length() {
+        push_diagnostic(
+          diagnostics,
+          "STATEMENT_AMOUNT_MISSING",
+          "Ntry/Amt",
+          "Each statement amount element must contain a value.",
+        )
+      }
+      for value in amount_values {
+        if Decimal::parse(value) is None {
+          push_diagnostic(
+            diagnostics,
+            "STATEMENT_AMOUNT_INVALID",
+            "Ntry/Amt",
+            "Statement entry amount must be a decimal with up to two decimal places.",
+          )
         }
+      }
+      for field in amount_elements {
         match field.get_attribute("Ccy") {
           Some(value) =>
             if !is_currency(value) {
