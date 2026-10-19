@@ -54,8 +54,8 @@ fn camt053_xml() -> String {
   #|    <GrpHdr><MsgId>CAMT-001</MsgId><CreDtTm>2026-10-16T08:00:00Z</CreDtTm></GrpHdr>
   #|    <Stmt>
   #|      <Id>STMT-001</Id>
-  #|      <Ntry><Amt Ccy="EUR">100.00</Amt><NtryDtls><TxDtls><Refs><EndToEndId>TX-001</EndToEndId></Refs></TxDtls></NtryDtls></Ntry>
-  #|      <Ntry><Amt Ccy="EUR">250.00</Amt><NtryDtls><TxDtls><Refs><EndToEndId>TX-002</EndToEndId></Refs></TxDtls></NtryDtls></Ntry>
+  #|      <Ntry><CdtDbtInd>CRDT</CdtDbtInd><Amt Ccy="EUR">100.00</Amt><NtryDtls><TxDtls><Refs><EndToEndId>TX-001</EndToEndId></Refs></TxDtls></NtryDtls></Ntry>
+  #|      <Ntry><CdtDbtInd>CRDT</CdtDbtInd><Amt Ccy="EUR">250.00</Amt><NtryDtls><TxDtls><Refs><EndToEndId>TX-002</EndToEndId></Refs></TxDtls></NtryDtls></Ntry>
   #|    </Stmt>
   #|  </BkToCstmrStmt>
   #|</Document>

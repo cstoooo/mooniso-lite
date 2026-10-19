@@ -58,10 +58,17 @@ fn main {
     println("Usage:")
     println("  \{program} [--format text|json|markdown] <message.xml>")
     println("  \{program} reconcile <pain.001.xml> <status.xml> [--format ...]")
+    println("  \{program} --list-rules")
     return
   }
   if args[1] == "--version" {
     println(@mooniso.version())
+    return
+  }
+  if args[1] == "--list-rules" {
+    for rule in @mooniso.rule_catalog() {
+      println(rule.code + " - " + rule.description)
+    }
     return
   }
   if args[1] == "reconcile" {

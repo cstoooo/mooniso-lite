@@ -8,10 +8,12 @@
     <Stmt>
       <Id>STMT-001</Id>
       <Ntry>
+        <CdtDbtInd>CRDT</CdtDbtInd>
         <Amt Ccy="EUR">100.00</Amt>
         <NtryDtls><TxDtls><Refs><EndToEndId>TX-001</EndToEndId></Refs></TxDtls></NtryDtls>
       </Ntry>
       <Ntry>
+        <CdtDbtInd>CRDT</CdtDbtInd>
         <Amt Ccy="EUR">250.00</Amt>
         <NtryDtls><TxDtls><Refs><EndToEndId>TX-002</EndToEndId></Refs></TxDtls></NtryDtls>
       </Ntry>

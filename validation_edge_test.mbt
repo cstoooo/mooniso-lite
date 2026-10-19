@@ -68,3 +68,19 @@ test "validation reports long end-to-end id and transaction count mismatch" {
   assert_true(json.contains("END_TO_END_ID_TOO_LONG"))
   assert_true(json.contains("TRANSACTION_COUNT_MISMATCH"))
 }
+
+
+///|
+test "validation rejects zero instructed amount" {
+  let xml =
+  #|<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+  #|  <CstmrCdtTrfInitn><GrpHdr><MsgId>MSG-ZERO</MsgId><CreDtTm>2026-10-16T08:00:00Z</CreDtTm><NbOfTxs>1</NbOfTxs><CtrlSum>0.00</CtrlSum></GrpHdr>
+  #|    <PmtInf><PmtInfId>P-ZERO</PmtInfId><ReqdExctnDt>2026-10-16</ReqdExctnDt>
+  #|      <CdtTrfTxInf><PmtId><EndToEndId>T-ZERO</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">0.00</InstdAmt></Amt></CdtTrfTxInf>
+  #|    </PmtInf>
+  #|  </CstmrCdtTrfInitn>
+  #|</Document>
+  let report = @mooniso_lite.validate_pain001(xml)
+  assert_false(report.is_valid())
+  assert_true(report.to_json().contains("INSTRUCTION_AMOUNT_NOT_POSITIVE"))
+}

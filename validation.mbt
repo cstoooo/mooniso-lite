@@ -390,7 +390,17 @@ pub fn validate_pain001(
       match data.instruction_amounts[i] {
         Some(value) =>
           match Decimal::parse(value) {
-            Some(decimal) => amount_sum = amount_sum.add(decimal)
+            Some(decimal) => {
+              amount_sum = amount_sum.add(decimal)
+              if !decimal.is_positive() {
+                push_diagnostic(
+                  diagnostics,
+                  "INSTRUCTION_AMOUNT_NOT_POSITIVE",
+                  indexed_path("CdtTrfTxInf/Amt/InstdAmt", i),
+                  "Instructed amount must be greater than zero.",
+                )
+              }
+            }
             None => {
               all_amounts_valid = false
               push_diagnostic(

@@ -59,3 +59,30 @@ test "camt053 reports invalid amount and missing currency" {
   assert_true(report.to_json().contains("STATEMENT_AMOUNT_INVALID"))
   assert_true(report.to_json().contains("STATEMENT_CURRENCY_MISSING"))
 }
+
+
+///|
+test "pacs008 rejects zero settlement amount" {
+  let xml =
+  #|<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">
+  #|  <FIToFICstmrCdtTrf><GrpHdr><MsgId>PACS-ZERO</MsgId><CreDtTm>2026-10-16T08:00:00Z</CreDtTm></GrpHdr>
+  #|    <CdtTrfTxInf><PmtId><EndToEndId>TX-ZERO</EndToEndId></PmtId><IntrBkSttlmAmt Ccy="EUR">0.00</IntrBkSttlmAmt></CdtTrfTxInf>
+  #|  </FIToFICstmrCdtTrf>
+  #|</Document>
+  let report = @mooniso_lite.validate_message(xml)
+  assert_false(report.is_valid())
+  assert_true(report.to_json().contains("SETTLEMENT_AMOUNT_NOT_POSITIVE"))
+}
+
+///|
+test "camt053 validates credit debit indicator" {
+  let xml =
+  #|<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+  #|  <BkToCstmrStmt><GrpHdr><MsgId>CAMT-IND</MsgId><CreDtTm>2026-10-16T08:00:00Z</CreDtTm></GrpHdr>
+  #|    <Stmt><Id>STMT-IND</Id><Ntry><CdtDbtInd>BAD</CdtDbtInd><Amt Ccy="EUR">10.00</Amt></Ntry></Stmt>
+  #|  </BkToCstmrStmt>
+  #|</Document>
+  let report = @mooniso_lite.validate_message(xml)
+  assert_false(report.is_valid())
+  assert_true(report.to_json().contains("ENTRY_CREDIT_DEBIT_INVALID"))
+}

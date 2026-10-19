@@ -222,13 +222,23 @@ pub fn validate_message(
         )
       }
       for value in amount_values {
-        if Decimal::parse(value) is None {
-          push_diagnostic(
-            diagnostics,
-            "SETTLEMENT_AMOUNT_INVALID",
-            "CdtTrfTxInf/IntrBkSttlmAmt",
-            "Settlement amount must be a decimal with up to two decimal places.",
-          )
+        match Decimal::parse(value) {
+          Some(decimal) =>
+            if !decimal.is_positive() {
+              push_diagnostic(
+                diagnostics,
+                "SETTLEMENT_AMOUNT_NOT_POSITIVE",
+                "CdtTrfTxInf/IntrBkSttlmAmt",
+                "Settlement amount must be greater than zero.",
+              )
+            }
+          None =>
+            push_diagnostic(
+              diagnostics,
+              "SETTLEMENT_AMOUNT_INVALID",
+              "CdtTrfTxInf/IntrBkSttlmAmt",
+              "Settlement amount must be a decimal with up to two decimal places.",
+            )
         }
       }
       for field in amount_elements {
@@ -291,6 +301,25 @@ pub fn validate_message(
               "Ntry/Amt/@Ccy",
               "Statement currency is required.",
             )
+        }
+      }
+      let indicators = texts_by_suffix(fields, "/Ntry/CdtDbtInd")
+      if indicators.length() != info.entry_count {
+        push_diagnostic(
+          diagnostics,
+          "ENTRY_CREDIT_DEBIT_MISSING",
+          "Ntry/CdtDbtInd",
+          "Each statement entry must contain a credit/debit indicator.",
+        )
+      }
+      for value in indicators {
+        if value != "CRDT" && value != "DBIT" {
+          push_diagnostic(
+            diagnostics,
+            "ENTRY_CREDIT_DEBIT_INVALID",
+            "Ntry/CdtDbtInd",
+            "Credit/debit indicator must be CRDT or DBIT.",
+          )
         }
       }
     }

@@ -51,6 +51,11 @@ pub fn Decimal::parse(value : String) -> Decimal? {
 }
 
 ///|
+pub fn Decimal::is_positive(self : Decimal) -> Bool {
+  self.minor_units > 0
+}
+
+///|
 pub fn Decimal::add(self : Decimal, other : Decimal) -> Decimal {
   { minor_units: self.minor_units + other.minor_units, scale: 2, }
 }
