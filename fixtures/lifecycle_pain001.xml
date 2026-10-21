@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+  <CstmrCdtTrfInitn>
+    <GrpHdr>
+      <MsgId>LIFE-PAIN-001</MsgId>
+      <CreDtTm>2026-10-21T08:00:00Z</CreDtTm>
+      <NbOfTxs>7</NbOfTxs>
+      <CtrlSum>335.00</CtrlSum>
+    </GrpHdr>
+    <PmtInf>
+      <PmtInfId>LIFE-PMT-001</PmtInfId>
+      <ReqdExctnDt>2026-10-21</ReqdExctnDt>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-SETTLED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">100.00</InstdAmt></Amt></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-NOT-POSTED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">80.00</InstdAmt></Amt></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-REJECTED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">50.00</InstdAmt></Amt></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-PENDING</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">25.00</InstdAmt></Amt></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-MISMATCH</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">40.00</InstdAmt></Amt></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-BEFORE-FINAL</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">30.00</InstdAmt></Amt></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-NO-STATUS</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">10.00</InstdAmt></Amt></CdtTrfTxInf>
+    </PmtInf>
+  </CstmrCdtTrfInitn>
+</Document>

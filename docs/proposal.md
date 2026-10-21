@@ -32,6 +32,8 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 - 支持 `pain.002`、`pacs.008`、`pacs.002` 和 `camt.053` 的基础解析与校验
 - 支持 `pain.001` 与状态报告交易按 `EndToEndId` 对账
 - 支持 `camt.053` 借贷方向校验
+- 支持付款、状态报告和对账单三方生命周期分类
+- 支持按状态与对账证据输出用户处理动作
 - 提供可查询的规则目录
 - 提供有效、无效和格式错误示例
 - 提供 `scripts/check.sh`
@@ -48,7 +50,7 @@ MoonISO Lite：MoonBit 实现的 ISO 20022 `pain.001` 支付报文校验工具�
 - 十进制处理：项目自研定点 Decimal 模块（`decimal.mbt`）
 - 文件读取：`moonbitlang/x/fs`
 - 测试：`moon test`
-- 测试数量：46 个单元测试
+- 测试数量：47 个单元测试
 - 云端检查：GitHub Actions
 
 ## 验收

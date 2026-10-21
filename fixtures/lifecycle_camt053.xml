@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+  <BkToCstmrStmt>
+    <GrpHdr><MsgId>LIFE-CAMT-001</MsgId><CreDtTm>2026-10-21T10:00:00Z</CreDtTm></GrpHdr>
+    <Stmt>
+      <Id>LIFE-STMT-001</Id>
+      <Ntry><CdtDbtInd>CRDT</CdtDbtInd><Amt Ccy="EUR">100.00</Amt><NtryDtls><TxDtls><Refs><EndToEndId>TX-SETTLED</EndToEndId></Refs></TxDtls></NtryDtls></Ntry>
+      <Ntry><CdtDbtInd>CRDT</CdtDbtInd><Amt Ccy="EUR">39.00</Amt><NtryDtls><TxDtls><Refs><EndToEndId>TX-MISMATCH</EndToEndId></Refs></TxDtls></NtryDtls></Ntry>
+      <Ntry><CdtDbtInd>CRDT</CdtDbtInd><Amt Ccy="EUR">30.00</Amt><NtryDtls><TxDtls><Refs><EndToEndId>TX-BEFORE-FINAL</EndToEndId></Refs></TxDtls></NtryDtls></Ntry>
+      <Ntry><CdtDbtInd>CRDT</CdtDbtInd><Amt Ccy="EUR">5.00</Amt><NtryDtls><TxDtls><Refs><EndToEndId>TX-ORPHAN-STATEMENT</EndToEndId></Refs></TxDtls></NtryDtls></Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

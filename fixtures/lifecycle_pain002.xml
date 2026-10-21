@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.002.001.03">
+  <CstmrPmtStsRpt>
+    <GrpHdr><MsgId>LIFE-STATUS-001</MsgId><CreDtTm>2026-10-21T09:00:00Z</CreDtTm></GrpHdr>
+    <OrgnlGrpInfAndSts><OrgnlMsgId>LIFE-PAIN-001</OrgnlMsgId></OrgnlGrpInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-SETTLED</OrgnlEndToEndId><TxSts>ACSC</TxSts></TxInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-NOT-POSTED</OrgnlEndToEndId><TxSts>ACSC</TxSts></TxInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-REJECTED</OrgnlEndToEndId><TxSts>RJCT</TxSts></TxInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-PENDING</OrgnlEndToEndId><TxSts>PDNG</TxSts></TxInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-MISMATCH</OrgnlEndToEndId><TxSts>ACSC</TxSts></TxInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-BEFORE-FINAL</OrgnlEndToEndId><TxSts>ACSP</TxSts></TxInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-ORPHAN-STATUS</OrgnlEndToEndId><TxSts>ACSC</TxSts></TxInfAndSts>
+  </CstmrPmtStsRpt>
+</Document>

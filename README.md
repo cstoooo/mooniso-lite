@@ -13,7 +13,7 @@ MoonBit command-line validator for ISO 20022 `pain.001` payment messages.
 - Payment reconciliation in `reconcile.mbt`
 - File input through `moonbitlang/x/fs`
 - CLI in `cmd/main`
-- 46 unit tests and 9 fixture messages
+- 47 unit tests and 12 fixture messages
 
 ## Status
 
@@ -36,6 +36,7 @@ moon run cmd/main -- fixtures/valid_pain002.xml
 moon run cmd/main -- fixtures/valid_camt053.xml
 moon run cmd/main -- reconcile fixtures/valid_pain001.xml fixtures/valid_pain002.xml
 moon run cmd/main -- --list-rules
+moon run cmd/main -- lifecycle fixtures/lifecycle_pain001.xml fixtures/lifecycle_pain002.xml fixtures/lifecycle_camt053.xml
 ```
 
 ## Rules
@@ -59,6 +60,8 @@ moon run cmd/main -- --list-rules
 - `reconcile` matches `pain.001` transactions with status report entries.
 - `camt.053` validates the `CdtDbtInd` credit/debit indicator.
 - `--list-rules` prints the rule catalog with codes and descriptions.
+- `lifecycle` classifies payment state across initiation, status and statement messages.
+- Version boundaries and a full lifecycle example are documented in `docs/version-scope-and-cases.md`.
 
 ## License
 
