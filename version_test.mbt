@@ -1,4 +1,4 @@
 ///|
 test "version is exposed" {
-  assert_eq(@mooniso_lite.version(), "0.5.0")
+  assert_eq(@moonpay_flow.version(), "0.5.0")
 }

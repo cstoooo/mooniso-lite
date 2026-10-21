@@ -1,6 +1,6 @@
 ///|
 test "rule catalog has unique codes" {
-  let rules = @mooniso_lite.rule_catalog()
+  let rules = @moonpay_flow.rule_catalog()
   assert_true(rules.length() >= 40)
   let seen : Map[String, Bool] = Map([])
   for rule in rules {

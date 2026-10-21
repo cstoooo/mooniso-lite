@@ -1,8 +1,8 @@
-![CI](https://github.com/cstoooo/mooniso-lite/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/cstoooo/moonpay-flow/actions/workflows/ci.yml/badge.svg)
 
-# MoonISO Lite
+# MoonPay Flow
 
-MoonBit command-line validator for ISO 20022 `pain.001` payment messages.
+MoonBit ISO 20022 payment lifecycle validator and reconciliation toolkit.
 
 ## Implementation
 
@@ -17,7 +17,7 @@ MoonBit command-line validator for ISO 20022 `pain.001` payment messages.
 
 ## Status
 
-Version: 0.4.0
+Version: 0.5.0
 
 Current support: `pain.001`, `pain.002`, `pacs.008`, `pacs.002` and `camt.053`.
 

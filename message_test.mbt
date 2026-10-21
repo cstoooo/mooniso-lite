@@ -64,18 +64,18 @@ fn camt053_xml() -> String {
 
 ///|
 test "message detection covers supported ISO messages" {
-  assert_true(@mooniso_lite.detect_message_kind(pain002_xml()) is @mooniso_lite.MessageKind::Pain002)
-  assert_true(@mooniso_lite.detect_message_kind(pacs008_xml()) is @mooniso_lite.MessageKind::Pacs008)
-  assert_true(@mooniso_lite.detect_message_kind(pacs002_xml()) is @mooniso_lite.MessageKind::Pacs002)
-  assert_true(@mooniso_lite.detect_message_kind(camt053_xml()) is @mooniso_lite.MessageKind::Camt053)
+  assert_true(@moonpay_flow.detect_message_kind(pain002_xml()) is @moonpay_flow.MessageKind::Pain002)
+  assert_true(@moonpay_flow.detect_message_kind(pacs008_xml()) is @moonpay_flow.MessageKind::Pacs008)
+  assert_true(@moonpay_flow.detect_message_kind(pacs002_xml()) is @moonpay_flow.MessageKind::Pacs002)
+  assert_true(@moonpay_flow.detect_message_kind(camt053_xml()) is @moonpay_flow.MessageKind::Camt053)
 }
 
 ///|
 test "valid status and statement messages pass" {
-  assert_true(@mooniso_lite.validate_message(pain002_xml()).is_valid())
-  assert_true(@mooniso_lite.validate_message(pacs002_xml()).is_valid())
-  assert_true(@mooniso_lite.validate_message(pacs008_xml()).is_valid())
-  assert_true(@mooniso_lite.validate_message(camt053_xml()).is_valid())
+  assert_true(@moonpay_flow.validate_message(pain002_xml()).is_valid())
+  assert_true(@moonpay_flow.validate_message(pacs002_xml()).is_valid())
+  assert_true(@moonpay_flow.validate_message(pacs008_xml()).is_valid())
+  assert_true(@moonpay_flow.validate_message(camt053_xml()).is_valid())
 }
 
 ///|
@@ -88,7 +88,7 @@ test "invalid status code is reported" {
   #|    <TxInfAndSts><OrgnlEndToEndId>TX-BAD</OrgnlEndToEndId><TxSts>UNKNOWN</TxSts></TxInfAndSts>
   #|  </CstmrPmtStsRpt>
   #|</Document>
-  let report = @mooniso_lite.validate_message(xml)
+  let report = @moonpay_flow.validate_message(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("STATUS_CODE_INVALID"))
 }

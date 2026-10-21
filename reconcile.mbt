@@ -163,7 +163,7 @@ pub fn ReconciliationReport::to_json(self : ReconciliationReport) -> String {
 ///|
 pub fn ReconciliationReport::to_markdown(self : ReconciliationReport) -> String {
   let output = StringBuilder()
-  output.write_string("# MoonISO reconciliation report\n\n")
+  output.write_string("# MoonPay Flow reconciliation report\n\n")
   output.write_string("- Matched transactions: ")
   output.write_string(self.matched.to_string())
   output.write_string("\n- Missing status entries: ")

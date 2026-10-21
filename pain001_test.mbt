@@ -24,7 +24,7 @@ fn sample_xml() -> String {
 
 ///|
 test "summarize pain.001 fields" {
-  let summary = @mooniso_lite.summarize_pain001(sample_xml())
+  let summary = @moonpay_flow.summarize_pain001(sample_xml())
   match summary.message_id {
     Some(value) => assert_eq(value, "MSG-001")
     None => fail("missing message id")

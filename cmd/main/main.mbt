@@ -1,6 +1,6 @@
 ///|
 fn print_validation(
-  report : @mooniso.MessageValidation,
+  report : @moonpay.MessageValidation,
   format : String,
 ) -> Unit {
   match format {
@@ -12,7 +12,7 @@ fn print_validation(
 
 ///|
 fn print_reconciliation(
-  report : @mooniso.ReconciliationReport,
+  report : @moonpay.ReconciliationReport,
   format : String,
 ) -> Unit {
   match format {
@@ -24,7 +24,7 @@ fn print_reconciliation(
 
 ///|
 fn print_lifecycle(
-  report : @mooniso.LifecycleReport,
+  report : @moonpay.LifecycleReport,
   format : String,
 ) -> Unit {
   match format {
@@ -61,12 +61,12 @@ fn read_format_and_paths(
 }
 
 ///|
-/// MoonISO CLI entry point.
+/// MoonPay Flow CLI entry point.
 fn main {
   let args = @env.args()
-  let program = if args.length() > 0 { args[0] } else { "mooniso-lite" }
+  let program = if args.length() > 0 { args[0] } else { "moonpay-flow" }
   if args.length() <= 1 || args[1] == "--help" || args[1] == "-h" {
-    println("MoonISO Lite \{@mooniso.version()}")
+    println("MoonPay Flow \{@moonpay.version()}")
     println("Usage:")
     println("  \{program} [--format text|json|markdown] <message.xml>")
     println("  \{program} reconcile <pain.001.xml> <status.xml> [--format ...]")
@@ -75,11 +75,11 @@ fn main {
     return
   }
   if args[1] == "--version" {
-    println(@mooniso.version())
+    println(@moonpay.version())
     return
   }
   if args[1] == "--list-rules" {
-    for rule in @mooniso.rule_catalog() {
+    for rule in @moonpay.rule_catalog() {
       println(rule.code + " - " + rule.description)
     }
     return
@@ -93,12 +93,12 @@ fn main {
     try {
       let pain_xml = @fs.read_file_to_string(paths[0])
       let status_xml = @fs.read_file_to_string(paths[1])
-      let report = @mooniso.reconcile_pain001_status(pain_xml, status_xml)
+      let report = @moonpay.reconcile_pain001_status(pain_xml, status_xml)
       print_reconciliation(report, format)
     } catch {
       @fs.IOError(message) => println("Cannot read input: \{message}")
-      @mooniso.XmlParseError(message) => println("Invalid XML: \{message}")
-      _ => println("MoonISO Lite error")
+      @moonpay.XmlParseError(message) => println("Invalid XML: \{message}")
+      _ => println("MoonPay Flow error")
     }
     return
   }
@@ -112,12 +112,12 @@ fn main {
       let pain_xml = @fs.read_file_to_string(paths[0])
       let status_xml = @fs.read_file_to_string(paths[1])
       let statement_xml = @fs.read_file_to_string(paths[2])
-      let report = @mooniso.lifecycle_report(pain_xml, status_xml, statement_xml)
+      let report = @moonpay.lifecycle_report(pain_xml, status_xml, statement_xml)
       print_lifecycle(report, format)
     } catch {
       @fs.IOError(message) => println("Cannot read input: \{message}")
-      @mooniso.XmlParseError(message) => println("Invalid XML: \{message}")
-      _ => println("MoonISO Lite error")
+      @moonpay.XmlParseError(message) => println("Invalid XML: \{message}")
+      _ => println("MoonPay Flow error")
     }
     return
   }
@@ -127,12 +127,12 @@ fn main {
     [file_path, ..] =>
       try {
         let xml = @fs.read_file_to_string(file_path)
-        let report = @mooniso.validate_message(xml)
+        let report = @moonpay.validate_message(xml)
         print_validation(report, format)
       } catch {
         @fs.IOError(message) => println("Cannot read \{file_path}: \{message}")
-        @mooniso.XmlParseError(message) => println("Invalid XML in \{file_path}: \{message}")
-        _ => println("MoonISO Lite error")
+        @moonpay.XmlParseError(message) => println("Invalid XML in \{file_path}: \{message}")
+        _ => println("MoonPay Flow error")
       }
   }
 }

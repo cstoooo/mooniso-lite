@@ -1,6 +1,6 @@
 ///|
 test "xml reader parses element attributes and text" {
-  let reader = @mooniso_lite.XmlReader::from_string("<root id=\"1\">hello</root>")
+  let reader = @moonpay_flow.XmlReader::from_string("<root id=\"1\">hello</root>")
   match reader.read_event().kind {
     Start(element) => {
       assert_eq(element.name, "root")
@@ -27,7 +27,7 @@ test "xml reader parses element attributes and text" {
 
 ///|
 test "xml reader decodes entities and skips comments" {
-  let reader = @mooniso_lite.XmlReader::from_string(
+  let reader = @moonpay_flow.XmlReader::from_string(
     "<root><!-- note -->A &amp; B &#65;</root>",
   )
   let _ = reader.read_event()
@@ -39,7 +39,7 @@ test "xml reader decodes entities and skips comments" {
 
 ///|
 test "xml reader parses self closing and cdata" {
-  let reader = @mooniso_lite.XmlReader::from_string("<root><item/><![CDATA[x<y]]></root>")
+  let reader = @moonpay_flow.XmlReader::from_string("<root><item/><![CDATA[x<y]]></root>")
   match reader.read_event().kind {
     Start(name) => assert_eq(name.name, "root")
     _ => fail("expected root start")
@@ -56,13 +56,13 @@ test "xml reader parses self closing and cdata" {
 
 ///|
 test "xml reader rejects mismatched tags" {
-  let reader = @mooniso_lite.XmlReader::from_string("<a></b>")
+  let reader = @moonpay_flow.XmlReader::from_string("<a></b>")
   let _ = reader.read_event()
   let failed = try {
     let _ = reader.read_event()
     false
   } catch {
-    @mooniso_lite.XmlParseError(_) => true
+    @moonpay_flow.XmlParseError(_) => true
   }
   assert_true(failed)
 }

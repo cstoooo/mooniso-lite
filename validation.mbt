@@ -574,7 +574,7 @@ pub fn ValidationReport::to_json(self : ValidationReport) -> String {
 ///|
 pub fn ValidationReport::to_markdown(self : ValidationReport) -> String {
   let output = StringBuilder()
-  output.write_string("# MoonISO Lite validation report\n\n")
+  output.write_string("# MoonPay Flow validation report\n\n")
   output.write_string("**Result:** ")
   if self.is_valid() {
     output.write_string("VALID\n\n")

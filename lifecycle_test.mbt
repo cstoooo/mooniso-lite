@@ -3,7 +3,7 @@ test "lifecycle classification covers payment states and orphans" {
   let pain = @fs.read_file_to_string("fixtures/lifecycle_pain001.xml")
   let status = @fs.read_file_to_string("fixtures/lifecycle_pain002.xml")
   let statement = @fs.read_file_to_string("fixtures/lifecycle_camt053.xml")
-  let report = @mooniso_lite.lifecycle_report(pain, status, statement)
+  let report = @moonpay_flow.lifecycle_report(pain, status, statement)
   assert_eq(report.cases.length(), 7)
   let states : Map[String, String] = Map([])
   for case in report.cases {

@@ -1,7 +1,7 @@
 import {
   "moonbitlang/core/env" @env,
   "moonbitlang/x/fs" @fs,
-  "cstoooo/mooniso_lite" @mooniso,
+  "cstoooo/moonpay_flow" @moonpay,
 }
 
 pkgtype(kind: "executable")

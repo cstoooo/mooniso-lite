@@ -1,6 +1,6 @@
 ///|
 test "message detection reports unknown type" {
-  let report = @mooniso_lite.validate_message("<Document><Unknown/></Document>")
+  let report = @moonpay_flow.validate_message("<Document><Unknown/></Document>")
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("UNKNOWN_MESSAGE_TYPE"))
 }
@@ -13,7 +13,7 @@ test "status report reports incomplete entry" {
   #|    <TxInfAndSts><OrgnlEndToEndId>TX-INC</OrgnlEndToEndId></TxInfAndSts>
   #|  </CstmrPmtStsRpt>
   #|</Document>
-  let report = @mooniso_lite.validate_message(xml)
+  let report = @moonpay_flow.validate_message(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("STATUS_ENTRY_INCOMPLETE"))
 }
@@ -27,7 +27,7 @@ test "status report reports duplicate original id" {
   #|    <TxInfAndSts><OrgnlEndToEndId>TX-DUP</OrgnlEndToEndId><TxSts>RJCT</TxSts></TxInfAndSts>
   #|  </CstmrPmtStsRpt>
   #|</Document>
-  let report = @mooniso_lite.validate_message(xml)
+  let report = @moonpay_flow.validate_message(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("STATUS_ID_DUPLICATE"))
 }
@@ -40,7 +40,7 @@ test "pacs008 reports invalid amount and missing currency" {
   #|    <CdtTrfTxInf><PmtId><EndToEndId>TX-BAD</EndToEndId></PmtId><IntrBkSttlmAmt>bad</IntrBkSttlmAmt></CdtTrfTxInf>
   #|  </FIToFICstmrCdtTrf>
   #|</Document>
-  let report = @mooniso_lite.validate_message(xml)
+  let report = @moonpay_flow.validate_message(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("SETTLEMENT_AMOUNT_INVALID"))
   assert_true(report.to_json().contains("SETTLEMENT_CURRENCY_MISSING"))
@@ -54,7 +54,7 @@ test "camt053 reports invalid amount and missing currency" {
   #|    <Stmt><Id>STMT-BAD</Id><Ntry><Amt>bad</Amt></Ntry></Stmt>
   #|  </BkToCstmrStmt>
   #|</Document>
-  let report = @mooniso_lite.validate_message(xml)
+  let report = @moonpay_flow.validate_message(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("STATEMENT_AMOUNT_INVALID"))
   assert_true(report.to_json().contains("STATEMENT_CURRENCY_MISSING"))
@@ -69,7 +69,7 @@ test "pacs008 rejects zero settlement amount" {
   #|    <CdtTrfTxInf><PmtId><EndToEndId>TX-ZERO</EndToEndId></PmtId><IntrBkSttlmAmt Ccy="EUR">0.00</IntrBkSttlmAmt></CdtTrfTxInf>
   #|  </FIToFICstmrCdtTrf>
   #|</Document>
-  let report = @mooniso_lite.validate_message(xml)
+  let report = @moonpay_flow.validate_message(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("SETTLEMENT_AMOUNT_NOT_POSITIVE"))
 }
@@ -82,7 +82,7 @@ test "camt053 validates credit debit indicator" {
   #|    <Stmt><Id>STMT-IND</Id><Ntry><CdtDbtInd>BAD</CdtDbtInd><Amt Ccy="EUR">10.00</Amt></Ntry></Stmt>
   #|  </BkToCstmrStmt>
   #|</Document>
-  let report = @mooniso_lite.validate_message(xml)
+  let report = @moonpay_flow.validate_message(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("ENTRY_CREDIT_DEBIT_INVALID"))
 }

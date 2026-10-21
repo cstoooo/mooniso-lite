@@ -60,7 +60,7 @@ fn invalid_pain001_xml() -> String {
 
 ///|
 test "valid pain.001 passes milestone rules" {
-  let report = @mooniso_lite.validate_pain001(valid_pain001_xml())
+  let report = @moonpay_flow.validate_pain001(valid_pain001_xml())
   assert_true(report.is_valid())
   assert_eq(report.summary.payment_instruction_count, 1)
   assert_eq(report.summary.transaction_count, 2)
@@ -68,14 +68,14 @@ test "valid pain.001 passes milestone rules" {
 
 ///|
 test "invalid pain.001 reports required-field and duplicate issues" {
-  let report = @mooniso_lite.validate_pain001(invalid_pain001_xml())
+  let report = @moonpay_flow.validate_pain001(invalid_pain001_xml())
   assert_false(report.is_valid())
   assert_true(report.diagnostics.length() >= 6)
 }
 
 ///|
 test "validation report supports json and markdown" {
-  let report = @mooniso_lite.validate_pain001(valid_pain001_xml())
+  let report = @moonpay_flow.validate_pain001(valid_pain001_xml())
   assert_true(report.to_json().contains("\"valid\": true"))
   assert_true(report.to_markdown().contains("**Result:** VALID"))
 }
@@ -106,7 +106,7 @@ fn invalid_format_pain001_xml() -> String {
 
 ///|
 test "format validation catches invalid values" {
-  let report = @mooniso_lite.validate_pain001(invalid_format_pain001_xml())
+  let report = @moonpay_flow.validate_pain001(invalid_format_pain001_xml())
   assert_false(report.is_valid())
   assert_true(report.diagnostics.length() >= 5)
 }
@@ -142,7 +142,7 @@ fn invalid_control_sum_pain001_xml() -> String {
 
 ///|
 test "control sum mismatch is reported" {
-  let report = @mooniso_lite.validate_pain001(invalid_control_sum_pain001_xml())
+  let report = @moonpay_flow.validate_pain001(invalid_control_sum_pain001_xml())
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("CONTROL_SUM_MISMATCH"))
 }
@@ -189,7 +189,7 @@ fn invalid_identity_pain001_xml() -> String {
 
 ///|
 test "identity, enum, iban and bic checks are reported" {
-  let report = @mooniso_lite.validate_pain001(invalid_identity_pain001_xml())
+  let report = @moonpay_flow.validate_pain001(invalid_identity_pain001_xml())
   assert_false(report.is_valid())
   let json = report.to_json()
   assert_true(json.contains("PAYMENT_INSTRUCTION_ID_DUPLICATE"))

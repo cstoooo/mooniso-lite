@@ -15,7 +15,7 @@ test "reconciliation reports statuses without matching payments" {
   #|    <TxInfAndSts><OrgnlEndToEndId>TX-EXTRA</OrgnlEndToEndId><TxSts>RJCT</TxSts></TxInfAndSts>
   #|  </CstmrPmtStsRpt>
   #|</Document>
-  let report = @mooniso_lite.reconcile_pain001_status(pain, status)
+  let report = @moonpay_flow.reconcile_pain001_status(pain, status)
   assert_eq(report.matched, 1)
   assert_eq(report.missing_payment.length(), 1)
 }
@@ -36,7 +36,7 @@ test "reconciliation reports mismatches in both directions" {
   #|    <TxInfAndSts><OrgnlEndToEndId>TX-ONLY-STATUS</OrgnlEndToEndId><TxSts>RJCT</TxSts></TxInfAndSts>
   #|  </CstmrPmtStsRpt>
   #|</Document>
-  let report = @mooniso_lite.reconcile_pain001_status(pain, status)
+  let report = @moonpay_flow.reconcile_pain001_status(pain, status)
   assert_eq(report.matched, 0)
   assert_eq(report.missing_status.length(), 1)
   assert_eq(report.missing_payment.length(), 1)

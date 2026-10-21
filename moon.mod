@@ -1,11 +1,11 @@
-name = "cstoooo/mooniso_lite"
+name = "cstoooo/moonpay_flow"
 version = "0.5.0"
 readme = "README.md"
-repository = "https://github.com/cstoooo/mooniso-lite"
+repository = "https://github.com/cstoooo/moonpay-flow"
 license = "Apache-2.0"
-keywords = ["moonbit", "iso20022", "pain001", "validator", "finance"]
+keywords = ["moonbit", "iso20022", "payments", "validator", "reconciliation", "finance"]
 preferred_target = "native"
-description = "MoonBit ISO 20022 pain.001 validator."
+description = "MoonBit ISO 20022 payment lifecycle validator and reconciliation toolkit."
 
 import {
   "moonbitlang/x@0.5.5",

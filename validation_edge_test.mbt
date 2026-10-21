@@ -11,7 +11,7 @@ fn pain001_without_payment_instruction() -> String {
 
 ///|
 test "validation reports missing payment instruction" {
-  let report = @mooniso_lite.validate_pain001(pain001_without_payment_instruction())
+  let report = @moonpay_flow.validate_pain001(pain001_without_payment_instruction())
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("PAYMENT_INSTRUCTION_MISSING"))
 }
@@ -30,7 +30,7 @@ test "validation reports duplicate payment instruction id" {
   #|    </PmtInf>
   #|  </CstmrCdtTrfInitn>
   #|</Document>
-  let report = @mooniso_lite.validate_pain001(xml)
+  let report = @moonpay_flow.validate_pain001(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("PAYMENT_INSTRUCTION_ID_DUPLICATE"))
 }
@@ -46,7 +46,7 @@ test "validation reports malformed dates amount and currency" {
   #|    </PmtInf>
   #|  </CstmrCdtTrfInitn>
   #|</Document>
-  let json = @mooniso_lite.validate_pain001(xml).to_json()
+  let json = @moonpay_flow.validate_pain001(xml).to_json()
   assert_true(json.contains("CREATION_TIME_INVALID"))
   assert_true(json.contains("EXECUTION_DATE_INVALID"))
   assert_true(json.contains("INSTRUCTION_AMOUNT_INVALID"))
@@ -64,7 +64,7 @@ test "validation reports long end-to-end id and transaction count mismatch" {
   #|    </PmtInf>
   #|  </CstmrCdtTrfInitn>
   #|</Document>
-  let json = @mooniso_lite.validate_pain001(xml).to_json()
+  let json = @moonpay_flow.validate_pain001(xml).to_json()
   assert_true(json.contains("END_TO_END_ID_TOO_LONG"))
   assert_true(json.contains("TRANSACTION_COUNT_MISMATCH"))
 }
@@ -80,7 +80,7 @@ test "validation rejects zero instructed amount" {
   #|    </PmtInf>
   #|  </CstmrCdtTrfInitn>
   #|</Document>
-  let report = @mooniso_lite.validate_pain001(xml)
+  let report = @moonpay_flow.validate_pain001(xml)
   assert_false(report.is_valid())
   assert_true(report.to_json().contains("INSTRUCTION_AMOUNT_NOT_POSITIVE"))
 }

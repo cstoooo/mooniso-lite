@@ -413,7 +413,7 @@ pub fn MessageValidation::to_json(self : MessageValidation) -> String {
 ///|
 pub fn MessageValidation::to_markdown(self : MessageValidation) -> String {
   let output = StringBuilder()
-  output.write_string("# MoonISO validation report\n\n")
+  output.write_string("# MoonPay Flow validation report\n\n")
   output.write_string("**Message type:** ")
   output.write_string(self.info.kind.name())
   output.write_string("\n\n**Result:** ")

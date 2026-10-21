@@ -22,7 +22,7 @@ test "pain.001 reconciles against pain.002" {
   #|    <TxInfAndSts><OrgnlEndToEndId>TX-002</OrgnlEndToEndId><TxSts>RJCT</TxSts></TxInfAndSts>
   #|  </CstmrPmtStsRpt>
   #|</Document>
-  let report = @mooniso_lite.reconcile_pain001_status(pain, status)
+  let report = @moonpay_flow.reconcile_pain001_status(pain, status)
   assert_eq(report.matched, 2)
   assert_eq(report.missing_status.length(), 0)
   assert_eq(report.missing_payment.length(), 0)
@@ -46,7 +46,7 @@ test "reconciliation reports missing status entries" {
   #|<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.002.001.03">
   #|  <CstmrPmtStsRpt><GrpHdr><MsgId>STS-X</MsgId><CreDtTm>2026-10-16T09:00:00Z</CreDtTm></GrpHdr></CstmrPmtStsRpt>
   #|</Document>
-  let report = @mooniso_lite.reconcile_pain001_status(pain, status)
+  let report = @moonpay_flow.reconcile_pain001_status(pain, status)
   assert_eq(report.matched, 0)
   assert_eq(report.missing_status.length(), 1)
 }
