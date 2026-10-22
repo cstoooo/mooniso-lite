@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+  <BkToCstmrStmt>
+    <GrpHdr>
+      <MsgId>CAMT-DUP-001</MsgId>
+      <CreDtTm>2026-10-22T08:00:00Z</CreDtTm>
+    </GrpHdr>
+    <Stmt>
+      <Id>STMT-DUP-001</Id>
+      <Acct><Id><IBAN>DE89370400440532013000</IBAN></Id></Acct>
+      <Bal>
+        <Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp>
+        <Amt Ccy="EUR">0.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+      </Bal>
+      <Ntry>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Amt Ccy="EUR">100.00</Amt>
+        <NtryDtls><TxDtls><Refs><EndToEndId>DUP-TX-001</EndToEndId></Refs></TxDtls></NtryDtls>
+      </Ntry>
+      <Ntry>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Amt Ccy="EUR">100.00</Amt>
+        <NtryDtls><TxDtls><Refs><EndToEndId>DUP-TX-001</EndToEndId></Refs></TxDtls></NtryDtls>
+      </Ntry>
+      <Bal>
+        <Tp><CdOrPrtry><Cd>CLBD</Cd></CdOrPrtry></Tp>
+        <Amt Ccy="EUR">200.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+      </Bal>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

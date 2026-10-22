@@ -1,7 +1,7 @@
 ///|
 test "rule catalog has unique codes" {
   let rules = @moonpay_flow.rule_catalog()
-  assert_true(rules.length() >= 40)
+  assert_true(rules.length() >= 60)
   let seen : Map[String, Bool] = Map([])
   for rule in rules {
     assert_false(seen.contains(rule.code))

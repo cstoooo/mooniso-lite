@@ -11,13 +11,14 @@ MoonBit ISO 20022 payment lifecycle validator and reconciliation toolkit.
 - Flat XML field extractor in `flat_xml.mbt`
 - Multi-message validation in `message.mbt`
 - Payment reconciliation in `reconcile.mbt`
+- Bank statement balance and duplicate audit in `statement_audit.mbt`
 - File input through `moonbitlang/x/fs`
 - CLI in `cmd/main`
-- 49 unit tests and 12 fixture messages
+- 67 unit tests and 15 fixture messages
 
 ## Status
 
-Version: 0.6.0
+Version: 0.6.1
 
 Current support: `pain.001`, `pain.002`, `pacs.008`, `pacs.002` and `camt.053`.
 
@@ -37,6 +38,9 @@ moon run cmd/main -- fixtures/valid_camt053.xml
 moon run cmd/main -- reconcile fixtures/valid_pain001.xml fixtures/valid_pain002.xml
 moon run cmd/main -- --list-rules
 moon run cmd/main -- lifecycle fixtures/lifecycle_pain001.xml fixtures/lifecycle_pain002.xml fixtures/lifecycle_camt053.xml
+moon run cmd/main -- audit fixtures/balanced_camt053.xml
+moon run cmd/main -- audit fixtures/balance_mismatch_camt053.xml --format json
+moon run cmd/main -- audit fixtures/duplicate_camt053.xml --format markdown
 ```
 
 ## Rules
@@ -61,7 +65,11 @@ moon run cmd/main -- lifecycle fixtures/lifecycle_pain001.xml fixtures/lifecycle
 - `camt.053` validates the `CdtDbtInd` credit/debit indicator.
 - `--list-rules` prints the rule catalog with codes and descriptions.
 - `lifecycle` classifies payment state across initiation, status and statement messages, including account ownership, debit/credit direction, refunds, reversals and net posted amount.
-- Version boundaries and a full lifecycle example are documented in `docs/version-scope-and-cases.md`.
+- `audit` verifies that closing balance equals opening balance plus credits minus debits.
+- Balance audit accepts `OPBD`/`PRCD` and `CLBD`/`ITBD`, checks balance currency and statement account scope, and reports the exact closing difference.
+- Exact duplicate statement entries are grouped by account, end-to-end ID, amount, currency, direction and reversal flag.
+- `audit` emits text, JSON or Markdown and keeps all monetary values as fixed-point strings.
+- Version boundaries, lifecycle and balance audit examples are documented in `docs/version-scope-and-cases.md` and `docs/statement-audit-cases.md`.
 
 ## License
 

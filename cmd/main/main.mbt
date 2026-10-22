@@ -35,6 +35,18 @@ fn print_lifecycle(
 }
 
 ///|
+fn print_statement_audit(
+  report : @moonpay.StatementAuditReport,
+  format : String,
+) -> Unit {
+  match format {
+    "json" => println(report.to_json())
+    "markdown" | "md" => println(report.to_markdown())
+    _ => println(report.to_text())
+  }
+}
+
+///|
 fn read_format_and_paths(
   args : Array[String],
   start_index : Int,
@@ -71,6 +83,7 @@ fn main {
     println("  \{program} [--format text|json|markdown] <message.xml>")
     println("  \{program} reconcile <pain.001.xml> <status.xml> [--format ...]")
     println("  \{program} lifecycle <pain.001.xml> <status.xml> <camt.053.xml> [--format ...]")
+    println("  \{program} audit <camt.053.xml> [--format ...]")
     println("  \{program} --list-rules")
     return
   }
@@ -114,6 +127,23 @@ fn main {
       let statement_xml = @fs.read_file_to_string(paths[2])
       let report = @moonpay.lifecycle_report(pain_xml, status_xml, statement_xml)
       print_lifecycle(report, format)
+    } catch {
+      @fs.IOError(message) => println("Cannot read input: \{message}")
+      @moonpay.XmlParseError(message) => println("Invalid XML: \{message}")
+      _ => println("MoonPay Flow error")
+    }
+    return
+  }
+  if args[1] == "audit" {
+    let (format, paths) = read_format_and_paths(args, 2)
+    if paths.length() < 1 {
+      println("audit requires a camt.053 file.")
+      return
+    }
+    try {
+      let statement_xml = @fs.read_file_to_string(paths[0])
+      let report = @moonpay.statement_audit(statement_xml)
+      print_statement_audit(report, format)
     } catch {
       @fs.IOError(message) => println("Cannot read input: \{message}")
       @moonpay.XmlParseError(message) => println("Invalid XML: \{message}")
