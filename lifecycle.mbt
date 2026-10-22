@@ -3,7 +3,9 @@ pub struct StatementRecord {
   end_to_end_id : String
   amount : Decimal
   currency : String
+  account_iban : String?
   credit_debit : String
+  reversal : Bool
 }
 
 ///|
@@ -15,6 +17,9 @@ pub(all) enum LifecycleState {
   MissingStatus
   StatementMismatch
   StatementBeforeFinalStatus
+  PartiallyRefunded
+  FullyRefunded
+  AccountUnmatched
 }
 
 ///|
@@ -27,6 +32,9 @@ pub fn LifecycleState::name(self : LifecycleState) -> String {
     MissingStatus => "MISSING_STATUS"
     StatementMismatch => "STATEMENT_MISMATCH"
     StatementBeforeFinalStatus => "STATEMENT_BEFORE_FINAL_STATUS"
+    PartiallyRefunded => "PARTIALLY_REFUNDED"
+    FullyRefunded => "FULLY_REFUNDED"
+    AccountUnmatched => "ACCOUNT_UNMATCHED"
   }
 }
 
@@ -35,9 +43,12 @@ pub struct LifecycleCase {
   end_to_end_id : String
   amount : Decimal
   currency : String
+  debtor_iban : String?
+  creditor_iban : String?
   status : String?
-  statement_amount : Decimal?
-  statement_currency : String?
+  statement_role : String
+  net_posted : Decimal?
+  reversal_count : Int
   state : LifecycleState
   action : String
 }
@@ -51,39 +62,115 @@ pub struct LifecycleReport {
 
 ///|
 pub fn statement_records(xml_text : String) -> Array[StatementRecord] raise XmlParseError {
-  let fields = flatten_xml(xml_text)
-  let ids = texts_by_suffix(fields, "/NtryDtls/TxDtls/Refs/EndToEndId")
-  let amounts = texts_by_suffix(fields, "/Ntry/Amt")
-  let amount_elements = elements_by_suffix(fields, "/Ntry/Amt")
-  let indicators = texts_by_suffix(fields, "/Ntry/CdtDbtInd")
-  let count = ids.length()
-  let amount_count = if amounts.length() < count { amounts.length() } else { count }
+  let reader = XmlReader::from_string(xml_text)
+  let path : Array[String] = []
   let records : Array[StatementRecord] = []
-  for i = 0; i < amount_count; i = i + 1 {
-    let currency = if i < amount_elements.length() {
-      amount_elements[i].get_attribute("Ccy")
-    } else {
-      None
-    }
-    match Decimal::parse(amounts[i]) {
-      Some(amount) =>
-        match currency {
-          Some(currency_code) => {
-            let direction = if i < indicators.length() {
-              indicators[i]
-            } else {
-              ""
-            }
-            records.push({
-              end_to_end_id: ids[i],
-              amount,
-              currency: currency_code,
-              credit_debit: direction,
-            })
-          }
-          None => ()
+  let mut account_iban : String? = None
+  let mut in_entry = false
+  let mut current_id : String? = None
+  let mut current_amount : String? = None
+  let mut current_currency : String? = None
+  let mut current_direction = ""
+  let mut current_reversal = false
+  for ;; {
+    match reader.read_event().kind {
+      Start(element) => {
+        path.push(element.name)
+        if path_equals(path, ["Document", "BkToCstmrStmt", "Stmt", "Ntry"]) {
+          in_entry = true
+          current_id = None
+          current_amount = None
+          current_currency = None
+          current_direction = ""
+          current_reversal = false
         }
-      None => ()
+        if path_equals(
+          path,
+          ["Document", "BkToCstmrStmt", "Stmt", "Ntry", "Amt"],
+        ) {
+          current_currency = element.get("Ccy")
+        }
+      }
+      Empty(element) => {
+        path.push(element.name)
+        if path_equals(
+          path,
+          ["Document", "BkToCstmrStmt", "Stmt", "Ntry", "Amt"],
+        ) {
+          current_currency = element.get("Ccy")
+        }
+        let _ = path.remove(path.length() - 1)
+      }
+      Text(content) => {
+        if path_equals(
+          path,
+          ["Document", "BkToCstmrStmt", "Stmt", "Acct", "Id", "IBAN"],
+        ) {
+          account_iban = Some(content)
+        } else if path_equals(
+          path,
+          ["Document", "BkToCstmrStmt", "Stmt", "Ntry", "Amt"],
+        ) {
+          current_amount = Some(content)
+        } else if path_equals(
+          path,
+          ["Document", "BkToCstmrStmt", "Stmt", "Ntry", "CdtDbtInd"],
+        ) {
+          current_direction = content
+        } else if path_equals(
+          path,
+          ["Document", "BkToCstmrStmt", "Stmt", "Ntry", "RvslInd"],
+        ) {
+          current_reversal = content == "true" || content == "1"
+        } else if path_equals(
+          path,
+          [
+            "Document",
+            "BkToCstmrStmt",
+            "Stmt",
+            "Ntry",
+            "NtryDtls",
+            "TxDtls",
+            "Refs",
+            "EndToEndId",
+          ],
+        ) {
+          current_id = Some(content)
+        }
+      }
+      End(name) => {
+        if name == "Ntry" && in_entry {
+          match current_id {
+            Some(id) =>
+              match current_amount {
+                Some(amount_text) =>
+                  match current_currency {
+                    Some(currency) =>
+                      match Decimal::parse(amount_text) {
+                        Some(amount) =>
+                          records.push({
+                            end_to_end_id: id,
+                            amount,
+                            currency,
+                            account_iban,
+                            credit_debit: current_direction,
+                            reversal: current_reversal,
+                          })
+                        None => ()
+                      }
+                    None => ()
+                  }
+                None => ()
+              }
+            None => ()
+          }
+          in_entry = false
+        }
+        if path.length() > 0 {
+          let _ = path.remove(path.length() - 1)
+        }
+      }
+      Eof => break
     }
   }
   records
@@ -97,41 +184,136 @@ fn action_for_state(state : LifecycleState) -> String {
     Rejected => "Review the rejection reason and decide whether to resend."
     Pending => "Query the payment status again later."
     MissingStatus => "Request a status report from the payment provider."
-    StatementMismatch => "Open an exception and verify amount or currency."
+    StatementMismatch => "Open an exception and verify amount, currency or posting direction."
     StatementBeforeFinalStatus => "Reconcile the statement entry with the current status."
+    PartiallyRefunded => "Check the refund/reversal amount and remaining balance."
+    FullyRefunded => "Do not treat this payment as completed; verify the refund or reversal."
+    AccountUnmatched => "Verify that the statement account belongs to the debtor or creditor."
   }
+}
+
+///|
+fn statement_role(
+  statement : StatementRecord,
+  payment : PaymentRecord,
+) -> String {
+  match statement.account_iban {
+    Some(account) => {
+      match payment.debtor_iban {
+        Some(debtor) =>
+          if account == debtor {
+            return "DEBTOR"
+          }
+        None => ()
+      }
+      match payment.creditor_iban {
+        Some(creditor) =>
+          if account == creditor {
+            return "CREDITOR"
+          }
+        None => ()
+      }
+    }
+    None => ()
+  }
+  "UNKNOWN"
+}
+
+///|
+fn selected_statements(
+  statements : Array[StatementRecord],
+  payment : PaymentRecord,
+) -> Array[StatementRecord] {
+  let has_debtor = statements.iter().any(fn(statement) {
+    statement_role(statement, payment) == "DEBTOR"
+  })
+  let has_creditor = statements.iter().any(fn(statement) {
+    statement_role(statement, payment) == "CREDITOR"
+  })
+  let selected_role = if has_debtor {
+    "DEBTOR"
+  } else if has_creditor {
+    "CREDITOR"
+  } else {
+    "UNKNOWN"
+  }
+  let result : Array[StatementRecord] = []
+  for statement in statements {
+    if statement_role(statement, payment) == selected_role {
+      result.push(statement)
+    }
+  }
+  result
 }
 
 ///|
 fn classify_case(
   status : String?,
-  statement : StatementRecord?,
+  all_statements : Array[StatementRecord],
   payment : PaymentRecord,
-) -> LifecycleState {
-  match statement {
-    Some(entry) =>
-      if entry.amount.compare(payment.amount) != 0 || entry.currency != payment.currency {
-        return StatementMismatch
-      }
-    None => ()
-  }
-  match status {
-    Some(value) =>
-      if value == "ACSC" {
-        match statement {
-          Some(_) => Settled
-          None => SettledNotPosted
+) -> (LifecycleState, String, Decimal?, Int) {
+  let statements = selected_statements(all_statements, payment)
+  if statements.length() == 0 {
+    let state = match status {
+      Some(value) =>
+        if value == "ACSC" {
+          SettledNotPosted
+        } else if value == "RJCT" {
+          Rejected
+        } else {
+          Pending
         }
-      } else if value == "RJCT" {
-        Rejected
-      } else {
-        match statement {
-          Some(_) => StatementBeforeFinalStatus
-          None => Pending
-        }
-      }
-    None => MissingStatus
+      None => MissingStatus
+    }
+    return (state, "UNKNOWN", None, 0)
   }
+  let role = statement_role(statements[0], payment)
+  if role == "UNKNOWN" {
+    return (AccountUnmatched, role, None, 0)
+  }
+  let normal_direction = if role == "DEBTOR" { "DBIT" } else { "CRDT" }
+  let mut net = Decimal::zero()
+  let mut reversal_count = 0
+  let mut currency_mismatch = false
+  for statement in statements {
+    if statement.currency != payment.currency {
+      currency_mismatch = true
+    }
+    let normal = statement.credit_debit == normal_direction && !statement.reversal
+    if normal {
+      net = net.add(statement.amount)
+    } else {
+      net = net.subtract(statement.amount)
+      reversal_count += 1
+    }
+  }
+  if currency_mismatch {
+    return (StatementMismatch, role, Some(net), reversal_count)
+  }
+  if net.compare(Decimal::zero()) <= 0 {
+    return (FullyRefunded, role, Some(net), reversal_count)
+  }
+  if net.compare(payment.amount) == 0 {
+    let state = match status {
+      Some(value) =>
+        if value == "ACSC" {
+          Settled
+        } else if value == "RJCT" {
+          Rejected
+        } else {
+          StatementBeforeFinalStatus
+        }
+      None => MissingStatus
+    }
+    return (state, role, Some(net), reversal_count)
+  }
+  if net.compare(payment.amount) < 0 {
+    if reversal_count > 0 {
+      return (PartiallyRefunded, role, Some(net), reversal_count)
+    }
+    return (StatementMismatch, role, Some(net), reversal_count)
+  }
+  (StatementMismatch, role, Some(net), reversal_count)
 }
 
 ///|
@@ -147,30 +329,28 @@ pub fn lifecycle_report(
   for record in statuses {
     status_map.set(record.end_to_end_id, record.status)
   }
-  let statement_map : Map[String, StatementRecord] = Map([])
-  for record in statements {
-    statement_map.set(record.end_to_end_id, record)
-  }
   let payment_ids : Map[String, Bool] = Map([])
   let cases : Array[LifecycleCase] = []
   for payment in payments {
     payment_ids.set(payment.end_to_end_id, true)
+    let records : Array[StatementRecord] = []
+    for statement in statements {
+      if statement.end_to_end_id == payment.end_to_end_id {
+        records.push(statement)
+      }
+    }
     let status = status_map.get(payment.end_to_end_id)
-    let statement = statement_map.get(payment.end_to_end_id)
-    let state = classify_case(status, statement, payment)
+    let (state, role, net_posted, reversal_count) = classify_case(status, records, payment)
     cases.push({
       end_to_end_id: payment.end_to_end_id,
       amount: payment.amount,
       currency: payment.currency,
+      debtor_iban: payment.debtor_iban,
+      creditor_iban: payment.creditor_iban,
       status,
-      statement_amount: match statement {
-        Some(entry) => Some(entry.amount)
-        None => None
-      },
-      statement_currency: match statement {
-        Some(entry) => Some(entry.currency)
-        None => None
-      },
+      statement_role: role,
+      net_posted,
+      reversal_count,
       state,
       action: action_for_state(state),
     })
@@ -206,6 +386,15 @@ pub fn LifecycleReport::to_text(self : LifecycleReport) -> String {
       Some(value) => value
       None => "(missing)"
     })
+    output.write_string(" | account=")
+    output.write_string(case.statement_role)
+    output.write_string(" | net=")
+    output.write_string(match case.net_posted {
+      Some(value) => value.to_string()
+      None => "(not posted)"
+    })
+    output.write_string(" | reversals=")
+    output.write_string(case.reversal_count.to_string())
     output.write_string(" | state=")
     output.write_string(case.state.name())
     output.write_string("\nAction: ")
@@ -237,21 +426,28 @@ pub fn LifecycleReport::to_json(self : LifecycleReport) -> String {
       Some(value) => Json::string(value)
       None => Json::null()
     }
-    let statement_amount : Json = match case.statement_amount {
-      Some(value) => Json::string(value.to_string())
+    let debtor_iban : Json = match case.debtor_iban {
+      Some(value) => Json::string(value)
       None => Json::null()
     }
-    let statement_currency : Json = match case.statement_currency {
+    let creditor_iban : Json = match case.creditor_iban {
       Some(value) => Json::string(value)
+      None => Json::null()
+    }
+    let net_posted : Json = match case.net_posted {
+      Some(value) => Json::string(value.to_string())
       None => Json::null()
     }
     cases.push({
       "endToEndId": case.end_to_end_id,
       "amount": case.amount.to_string(),
       "currency": case.currency,
+      "debtorIban": debtor_iban,
+      "creditorIban": creditor_iban,
       "status": status,
-      "statementAmount": statement_amount,
-      "statementCurrency": statement_currency,
+      "statementRole": case.statement_role,
+      "netPosted": net_posted,
+      "reversalCount": case.reversal_count,
       "state": case.state.name(),
       "action": case.action,
     })
@@ -275,8 +471,8 @@ pub fn LifecycleReport::to_json(self : LifecycleReport) -> String {
 pub fn LifecycleReport::to_markdown(self : LifecycleReport) -> String {
   let output = StringBuilder()
   output.write_string("# Payment lifecycle report\n\n")
-  output.write_string("| EndToEndId | Amount | Status | State | Action |\n")
-  output.write_string("|---|---|---|---|---|\n")
+  output.write_string("| EndToEndId | Amount | Status | Account | Net posted | State | Action |\n")
+  output.write_string("|---|---|---|---|---|---|---|\n")
   for case in self.cases {
     output.write_string("| `")
     output.write_string(case.end_to_end_id)
@@ -288,6 +484,13 @@ pub fn LifecycleReport::to_markdown(self : LifecycleReport) -> String {
     output.write_string(match case.status {
       Some(value) => value
       None => "(missing)"
+    })
+    output.write_string(" | ")
+    output.write_string(case.statement_role)
+    output.write_string(" | ")
+    output.write_string(match case.net_posted {
+      Some(value) => value.to_string()
+      None => "(not posted)"
     })
     output.write_string(" | `")
     output.write_string(case.state.name())

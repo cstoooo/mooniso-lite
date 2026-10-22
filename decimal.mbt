@@ -61,6 +61,11 @@ pub fn Decimal::add(self : Decimal, other : Decimal) -> Decimal {
 }
 
 ///|
+pub fn Decimal::subtract(self : Decimal, other : Decimal) -> Decimal {
+  { minor_units: self.minor_units - other.minor_units, scale: 2, }
+}
+
+///|
 pub fn Decimal::compare(self : Decimal, other : Decimal) -> Int {
   if self.minor_units < other.minor_units {
     -1
@@ -73,12 +78,14 @@ pub fn Decimal::compare(self : Decimal, other : Decimal) -> Int {
 
 ///|
 pub fn Decimal::to_string(self : Decimal) -> String {
-  let whole = self.minor_units / 100
-  let fraction = self.minor_units % 100
+  let negative = self.minor_units < 0
+  let absolute = if negative { -self.minor_units } else { self.minor_units }
+  let whole = absolute / 100
+  let fraction = absolute % 100
   let fraction_text = if fraction < 10 {
     "0" + fraction.to_string()
   } else {
     fraction.to_string()
   }
-  whole.to_string() + "." + fraction_text
+  (if negative { "-" } else { "" }) + whole.to_string() + "." + fraction_text
 }

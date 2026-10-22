@@ -4,19 +4,22 @@
     <GrpHdr>
       <MsgId>LIFE-PAIN-001</MsgId>
       <CreDtTm>2026-10-21T08:00:00Z</CreDtTm>
-      <NbOfTxs>7</NbOfTxs>
-      <CtrlSum>335.00</CtrlSum>
+      <NbOfTxs>9</NbOfTxs>
+      <CtrlSum>415.00</CtrlSum>
     </GrpHdr>
     <PmtInf>
       <PmtInfId>LIFE-PMT-001</PmtInfId>
       <ReqdExctnDt>2026-10-21</ReqdExctnDt>
-      <CdtTrfTxInf><PmtId><EndToEndId>TX-SETTLED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">100.00</InstdAmt></Amt></CdtTrfTxInf>
-      <CdtTrfTxInf><PmtId><EndToEndId>TX-NOT-POSTED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">80.00</InstdAmt></Amt></CdtTrfTxInf>
-      <CdtTrfTxInf><PmtId><EndToEndId>TX-REJECTED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">50.00</InstdAmt></Amt></CdtTrfTxInf>
-      <CdtTrfTxInf><PmtId><EndToEndId>TX-PENDING</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">25.00</InstdAmt></Amt></CdtTrfTxInf>
-      <CdtTrfTxInf><PmtId><EndToEndId>TX-MISMATCH</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">40.00</InstdAmt></Amt></CdtTrfTxInf>
-      <CdtTrfTxInf><PmtId><EndToEndId>TX-BEFORE-FINAL</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">30.00</InstdAmt></Amt></CdtTrfTxInf>
-      <CdtTrfTxInf><PmtId><EndToEndId>TX-NO-STATUS</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">10.00</InstdAmt></Amt></CdtTrfTxInf>
+      <DbtrAcct><Id><IBAN>DE89370400440532013000</IBAN></Id></DbtrAcct>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-SETTLED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">100.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-NOT-POSTED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">80.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-REJECTED</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">50.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-PENDING</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">25.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-MISMATCH</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">40.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-BEFORE-FINAL</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">30.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-NO-STATUS</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">10.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-FULL-REFUND</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">20.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
+      <CdtTrfTxInf><PmtId><EndToEndId>TX-PARTIAL-REFUND</EndToEndId></PmtId><Amt><InstdAmt Ccy="EUR">60.00</InstdAmt></Amt><CdtrAcct><Id><IBAN>FR1420041010050500013M02606</IBAN></Id></CdtrAcct></CdtTrfTxInf>
     </PmtInf>
   </CstmrCdtTrfInitn>
 </Document>

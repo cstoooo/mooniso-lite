@@ -3,6 +3,8 @@ pub struct PaymentRecord {
   end_to_end_id : String
   amount : Decimal
   currency : String
+  debtor_iban : String?
+  creditor_iban : String?
 }
 
 ///|
@@ -33,7 +35,13 @@ pub fn pain001_payment_records(
             match data.instruction_currencies[i] {
               Some(currency) =>
                 match Decimal::parse(amount_text) {
-                  Some(amount) => records.push({ end_to_end_id: id, amount, currency, })
+                  Some(amount) => records.push({
+                    end_to_end_id: id,
+                    amount,
+                    currency,
+                    debtor_iban: data.transaction_debtor_ibans[i],
+                    creditor_iban: data.transaction_creditor_ibans[i],
+                  })
                   None => ()
                 }
               None => ()

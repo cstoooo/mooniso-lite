@@ -22,6 +22,8 @@ priv struct Pain001Data {
   debtor_bics : Array[String?]
   creditor_ibans : Array[String?]
   creditor_bics : Array[String?]
+  transaction_debtor_ibans : Array[String?]
+  transaction_creditor_ibans : Array[String?]
   declared_transaction_count : String?
   declared_control_sum : String?
 }
@@ -65,6 +67,10 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise XmlParseError {
   let debtor_bics : Array[String?] = []
   let creditor_ibans : Array[String?] = []
   let creditor_bics : Array[String?] = []
+  let transaction_debtor_ibans : Array[String?] = []
+  let transaction_creditor_ibans : Array[String?] = []
+  let mut current_pmt_debtor_iban : String? = None
+  let mut current_pmt_tx_start = 0
   for ;; {
     let event = reader.read_event()
     match event.kind {
@@ -77,6 +83,8 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise XmlParseError {
           charge_bearers.push(None)
           debtor_ibans.push(None)
           debtor_bics.push(None)
+          current_pmt_debtor_iban = None
+          current_pmt_tx_start = end_to_end_ids.length()
         }
         if path_equals(
           path,
@@ -92,6 +100,8 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise XmlParseError {
           instruction_currencies.push(None)
           creditor_ibans.push(None)
           creditor_bics.push(None)
+          transaction_debtor_ibans.push(current_pmt_debtor_iban)
+          transaction_creditor_ibans.push(None)
         }
         if path_equals(
           path,
@@ -183,6 +193,10 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise XmlParseError {
           ],
         ) {
           set_last(debtor_ibans, content)
+          current_pmt_debtor_iban = Some(content)
+          for tx = current_pmt_tx_start; tx < transaction_debtor_ibans.length(); tx = tx + 1 {
+            transaction_debtor_ibans[tx] = Some(content)
+          }
         } else if path_equals(
           path,
           [
@@ -220,6 +234,7 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise XmlParseError {
           ],
         ) {
           set_last(creditor_ibans, content)
+          set_last(transaction_creditor_ibans, content)
         } else if path_equals(
           path,
           [
@@ -274,6 +289,8 @@ fn parse_pain001_data(xml_text : String) -> Pain001Data raise XmlParseError {
     debtor_bics,
     creditor_ibans,
     creditor_bics,
+    transaction_debtor_ibans,
+    transaction_creditor_ibans,
     declared_transaction_count,
     declared_control_sum,
   }

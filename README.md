@@ -13,11 +13,11 @@ MoonBit ISO 20022 payment lifecycle validator and reconciliation toolkit.
 - Payment reconciliation in `reconcile.mbt`
 - File input through `moonbitlang/x/fs`
 - CLI in `cmd/main`
-- 47 unit tests and 12 fixture messages
+- 49 unit tests and 12 fixture messages
 
 ## Status
 
-Version: 0.5.0
+Version: 0.6.0
 
 Current support: `pain.001`, `pain.002`, `pacs.008`, `pacs.002` and `camt.053`.
 
@@ -60,7 +60,7 @@ moon run cmd/main -- lifecycle fixtures/lifecycle_pain001.xml fixtures/lifecycle
 - `reconcile` matches `pain.001` transactions with status report entries.
 - `camt.053` validates the `CdtDbtInd` credit/debit indicator.
 - `--list-rules` prints the rule catalog with codes and descriptions.
-- `lifecycle` classifies payment state across initiation, status and statement messages.
+- `lifecycle` classifies payment state across initiation, status and statement messages, including account ownership, debit/credit direction, refunds, reversals and net posted amount.
 - Version boundaries and a full lifecycle example are documented in `docs/version-scope-and-cases.md`.
 
 ## License

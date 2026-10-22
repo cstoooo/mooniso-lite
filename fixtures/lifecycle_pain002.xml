@@ -9,6 +9,8 @@
     <TxInfAndSts><OrgnlEndToEndId>TX-PENDING</OrgnlEndToEndId><TxSts>PDNG</TxSts></TxInfAndSts>
     <TxInfAndSts><OrgnlEndToEndId>TX-MISMATCH</OrgnlEndToEndId><TxSts>ACSC</TxSts></TxInfAndSts>
     <TxInfAndSts><OrgnlEndToEndId>TX-BEFORE-FINAL</OrgnlEndToEndId><TxSts>ACSP</TxSts></TxInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-FULL-REFUND</OrgnlEndToEndId><TxSts>ACSC</TxSts></TxInfAndSts>
+    <TxInfAndSts><OrgnlEndToEndId>TX-PARTIAL-REFUND</OrgnlEndToEndId><TxSts>ACSC</TxSts></TxInfAndSts>
     <TxInfAndSts><OrgnlEndToEndId>TX-ORPHAN-STATUS</OrgnlEndToEndId><TxSts>ACSC</TxSts></TxInfAndSts>
   </CstmrPmtStsRpt>
 </Document>
